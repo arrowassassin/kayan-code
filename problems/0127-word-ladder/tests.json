@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": ["hit", "cog", ["hot","dot","dog","lot","log","cog"]], "expected": 5 },
+    { "input": ["hit", "cog", ["hot","dot","dog","lot","log"]], "expected": 0 }
+  ],
+  "hidden": [
+    { "input": ["a", "c", ["a","b","c"]], "expected": 2 },
+    { "input": ["hot", "dog", ["hot","dog"]], "expected": 0 },
+    { "input": ["hot", "dog", ["hot","dog","dot"]], "expected": 3 },
+    { "input": ["ab", "cd", ["ad","bd","cd"]], "expected": 3 },
+    { "input": ["cold", "warm", ["cord","card","ward","warm","word","wore"]], "expected": 5 },
+    { "input": ["talk", "tail", ["talk","tons","fall","tail","gale","hall","negs"]], "expected": 0 },
+    { "input": ["leet", "code", ["lest","leet","lose","code","lode","robe","lost"]], "expected": 6 },
+    { "input_py": "['aaaaaaaaaa', 'jjjjjjjjjj', [''.join(('j' if q < p else (chr(ord('a') + k) if q == p else 'a')) for q in range(10)) for p in range(10) for k in range(1, 10)] + [''.join(chr(ord('k') + (i // 10**d) % 10) for d in range(10)) for i in range(4900)]]", "expected": 11 }
+  ]
+}

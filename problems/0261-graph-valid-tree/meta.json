@@ -1,0 +1,12 @@
+{
+  "id": 261,
+  "title": "Graph Valid Tree",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "validTree",
+    "compare": "exact"
+  }
+}

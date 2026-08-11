@@ -1,0 +1,13 @@
+{
+  "id": 417,
+  "title": "Pacific Atlantic Water Flow",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0130-surrounded-regions",
+  "judge": {
+    "mode": "function",
+    "entry": "pacificAtlantic",
+    "compare": "unordered_2d"
+  }
+}

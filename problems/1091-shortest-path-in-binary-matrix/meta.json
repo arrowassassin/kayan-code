@@ -1,0 +1,12 @@
+{
+  "id": 1091,
+  "title": "Shortest Path in Binary Matrix",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "shortestPathBinaryMatrix",
+    "compare": "exact"
+  }
+}

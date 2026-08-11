@@ -1,0 +1,14 @@
+{
+  "id": 133,
+  "title": "Clone Graph",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "cloneGraph",
+    "compare": "exact",
+    "arg_types": ["graph"],
+    "ret_type": "graph"
+  }
+}

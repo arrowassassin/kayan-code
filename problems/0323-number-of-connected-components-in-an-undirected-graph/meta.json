@@ -1,0 +1,12 @@
+{
+  "id": 323,
+  "title": "Number of Connected Components in an Undirected Graph",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "countComponents",
+    "compare": "exact"
+  }
+}

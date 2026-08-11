@@ -1,0 +1,18 @@
+{
+  "visible": [
+    { "input": [[["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]],
+      "expected": [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]] },
+    { "input": [[["O"]]], "expected": [["O"]] }
+  ],
+  "hidden": [
+    { "input": [[["X"]]], "expected": [["X"]] },
+    { "input": [[["O","O"],["O","O"]]], "expected": [["O","O"],["O","O"]] },
+    { "input": [[["X","X","X"],["X","O","X"],["X","X","X"]]], "expected": [["X","X","X"],["X","X","X"],["X","X","X"]] },
+    { "input": [[["O","X","O"],["X","O","X"],["O","X","O"]]], "expected": [["O","X","O"],["X","X","X"],["O","X","O"]] },
+    { "input": [[["X","O","X"],["X","O","X"],["X","O","X"]]], "expected": [["X","O","X"],["X","O","X"],["X","O","X"]] },
+    { "input": [[["X","X","X","X","X"],["X","O","O","O","X"],["X","O","X","O","X"],["X","O","O","O","X"],["X","X","X","X","X"]]],
+      "expected": [["X","X","X","X","X"],["X","X","X","X","X"],["X","X","X","X","X"],["X","X","X","X","X"],["X","X","X","X","X"]] },
+    { "input": [[["O","O","O"],["O","X","O"],["O","O","O"]]], "expected": [["O","O","O"],["O","X","O"],["O","O","O"]] },
+    { "input_py": "[[['O' if (i in (0, 199) or j in (0, 199) or (i + j) % 2 == 0) else 'X' for j in range(200)] for i in range(200)]]", "expected_py": "[['O' if (i in (0, 199) or j in (0, 199) or ((i + j) % 2 == 0 and (i in (1, 198) or j in (1, 198)))) else 'X' for j in range(200)] for i in range(200)]" }
+  ]
+}

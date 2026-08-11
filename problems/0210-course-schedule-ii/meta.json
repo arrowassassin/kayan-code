@@ -1,0 +1,13 @@
+{
+  "id": 210,
+  "title": "Course Schedule II",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0207-course-schedule",
+  "judge": {
+    "mode": "function",
+    "entry": "findOrder",
+    "compare": "exact"
+  }
+}

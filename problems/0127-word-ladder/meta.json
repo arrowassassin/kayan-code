@@ -1,0 +1,12 @@
+{
+  "id": 127,
+  "title": "Word Ladder",
+  "difficulty": "Hard",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "ladderLength",
+    "compare": "exact"
+  }
+}
