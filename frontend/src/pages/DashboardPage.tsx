@@ -49,7 +49,12 @@ export function DashboardPage() {
         {[
           [stats.solved, 'problems solved'],
           [stats.attempted, 'attempted'],
-          [stats.submissions, 'submissions'],
+          [
+            stats.median_solve_seconds != null
+              ? `${Math.floor(stats.median_solve_seconds / 60)}m`
+              : '—',
+            'median solve (25m target)',
+          ],
           [daily?.streak ?? 0, 'day streak 🔥'],
         ].map(([v, label]) => (
           <Card key={label as string}>

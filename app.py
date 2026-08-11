@@ -32,6 +32,7 @@ def db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA busy_timeout=10000")
     return conn
 
 
@@ -86,6 +87,9 @@ def init_db():
                          " NOT NULL DEFAULT 'python'")
         if "transpiled_code" not in cols:
             conn.execute("ALTER TABLE submissions ADD COLUMN transpiled_code TEXT")
+        if "elapsed_s" not in cols:
+            # seconds from first keystroke to this submission (client-tracked)
+            conn.execute("ALTER TABLE submissions ADD COLUMN elapsed_s INTEGER")
 
 
 init_db()
@@ -106,10 +110,28 @@ def _read(path):
         return f.read()
 
 
+_bank_cache = {"stamp": None, "bank": {}}
+
+
 def load_bank():
-    bank = {}
+    """Bank metadata, cached against the problems dir's mtime signature so we
+    don't re-parse 79 meta.json files on every request."""
     if not os.path.isdir(PROBLEMS_DIR):
-        return bank
+        return {}
+    names = os.listdir(PROBLEMS_DIR)
+    metas = [os.path.join(PROBLEMS_DIR, n, "meta.json") for n in names]
+    stamp = (len(names),
+             max((os.path.getmtime(m) for m in metas if os.path.exists(m)),
+                 default=0))
+    if _bank_cache["stamp"] == stamp:
+        return _bank_cache["bank"]
+    bank = _scan_bank()
+    _bank_cache.update(stamp=stamp, bank=bank)
+    return bank
+
+
+def _scan_bank():
+    bank = {}
     for name in sorted(os.listdir(PROBLEMS_DIR)):
         pdir = os.path.join(PROBLEMS_DIR, name)
         meta_path = os.path.join(pdir, "meta.json")
@@ -129,7 +151,7 @@ def get_problem_meta(slug):
     bank = load_bank()
     if slug not in bank:
         raise HTTPException(404, f"Unknown problem: {slug}")
-    return bank[slug]
+    return dict(bank[slug])  # copy: callers mutate (pop "dir") freely
 
 
 # ---------------------------------------------------------------- API: bank
@@ -139,7 +161,9 @@ def list_problems():
     bank = load_bank()
     with db() as conn:
         rows = conn.execute(
-            "SELECT slug, MAX(verdict='AC') AS solved, COUNT(*) AS attempts "
+            "SELECT slug, MAX(verdict='AC') AS solved, COUNT(*) AS attempts,"
+            " MAX(created_at) AS last_submitted_at,"
+            " MIN(CASE WHEN verdict='AC' THEN elapsed_s END) AS solve_seconds "
             "FROM submissions GROUP BY slug").fetchall()
         state = {r["slug"]: r for r in rows}
         due_rows = conn.execute(
@@ -160,6 +184,8 @@ def list_problems():
             "solved": bool(s and s["solved"]),
             "attempted": bool(s),
             "attempts": s["attempts"] if s else 0,
+            "last_submitted_at": s["last_submitted_at"] if s else None,
+            "solve_seconds": s["solve_seconds"] if s else None,
             "due_for_review": slug in due,
         })
     out.sort(key=lambda p: (p["snowflake_priority"], p["id"] or 0))
@@ -232,6 +258,7 @@ class SubmitRequest(BaseModel):
     language: str = "python"
     mode: str = "practice"          # practice | interview | whiteboard | mock
     mock_session_id: str | None = None
+    elapsed_s: int | None = None    # first-keystroke -> submit, client-tracked
 
 
 def resolve_python_code(meta, code, language):
@@ -254,8 +281,11 @@ def run_code(req: RunRequest):
     meta = get_problem_meta(req.slug)
     code, transpiled = resolve_python_code(meta, req.code, req.language)
     custom = req.cases if req.cases else None
-    result = runner.judge_submission(meta["dir"], code,
-                                     include_hidden=False, custom_cases=custom)
+    try:
+        result = runner.judge_submission(meta["dir"], code,
+                                         include_hidden=False, custom_cases=custom)
+    except ValueError as e:  # malformed/oversized custom cases
+        raise HTTPException(422, str(e))
     if transpiled:
         result["transpiled_code"] = transpiled
     return result
@@ -277,11 +307,13 @@ def submit_code(req: SubmitRequest):
     with db() as conn:
         cur = conn.execute(
             "INSERT INTO submissions (slug, code, verdict, passed, total, runtime_ms,"
-            " mode, mock_session_id, result_json, created_at, language, transpiled_code)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            " mode, mock_session_id, result_json, created_at, language,"
+            " transpiled_code, elapsed_s)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (req.slug, req.code, result["verdict"], result["passed"], result["total"],
              result["runtime_ms"], req.mode, req.mock_session_id,
-             json.dumps(result), iso(now()), req.language.lower(), transpiled))
+             json.dumps(result), iso(now()), req.language.lower(), transpiled,
+             req.elapsed_s))
         result["submission_id"] = cur.lastrowid
     if transpiled:
         result["transpiled_code"] = transpiled
@@ -582,7 +614,17 @@ def stats():
     for s in subs:
         day = s["created_at"][:10]
         activity[day] = activity.get(day, 0) + 1
+    with db() as conn:
+        solve_rows = conn.execute(
+            "SELECT slug, MIN(elapsed_s) AS seconds FROM submissions"
+            " WHERE verdict='AC' AND elapsed_s IS NOT NULL"
+            " GROUP BY slug ORDER BY seconds").fetchall()
+    solve_times = [dict(r) for r in solve_rows]
+    secs = sorted(r["seconds"] for r in solve_rows)
+    median_solve = secs[len(secs) // 2] if secs else None
     return {
+        "solve_times": solve_times,
+        "median_solve_seconds": median_solve,
         "total_problems": len(bank),
         "solved": len(solved),
         "attempted": len(attempts),

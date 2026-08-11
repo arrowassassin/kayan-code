@@ -329,12 +329,12 @@ def main():
     signal.signal(signal.SIGALRM, _alarm)
     results = []
     for case in payload["cases"]:
-        raw_input = case["input"]
         expected = case.get("expected")
         cap = CappedWriter(STDOUT_CAP)
         real_stdout = sys.stdout
         verdict, output_repr, error, elapsed_ms = "AC", None, None, 0
         try:
+            raw_input = case["input"]  # inside try: malformed case -> RE, not crash
             if mode == "function":
                 args = list(raw_input)
                 if arg_types:
@@ -394,12 +394,22 @@ def main():
         except RecursionError:
             verdict = "RE"
             error = "RecursionError: maximum recursion depth exceeded"
-        except Exception:
+        except (SystemExit, KeyboardInterrupt):
+            verdict = "RE"
+            error = "Solution attempted to exit the process (sys.exit/interrupt)"
+        except BaseException:
             verdict = "RE"
             error = trimmed_traceback()
         finally:
             signal.setitimer(signal.ITIMER_REAL, 0)
             sys.stdout = real_stdout
+
+        # TLE cannot be dodged by swallowing the alarm exception or resetting
+        # the itimer inside user code: wall clock is re-checked post-hoc.
+        if verdict in ("AC", "WA") and elapsed_ms > time_limit * 1000:
+            verdict = "TLE"
+            error = f"Time limit exceeded ({time_limit:.0f}s)"
+            output_repr = None
 
         stdout_text = cap.getvalue()
         if cap.truncated:

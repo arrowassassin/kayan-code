@@ -14,6 +14,16 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    chunkSizeWarningLimit: 1200,
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          if (id.includes('codemirror') || id.includes('@lezer')) return 'codemirror'
+          if (id.includes('recharts') || id.includes('d3-')) return 'charts'
+          if (id.includes('react-markdown') || id.includes('remark') || id.includes('micromark'))
+            return 'markdown'
+        },
+      },
+    },
   },
 })

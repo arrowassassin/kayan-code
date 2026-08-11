@@ -1,12 +1,23 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { CheckCircle2, Circle, CircleDot, Search, Star } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowUp,
+  CheckCircle2,
+  Circle,
+  CircleDot,
+  Search,
+  Star,
+} from 'lucide-react'
 import { api, type ProblemSummary } from '@/lib/api'
-import { cn } from '@/lib/utils'
+import { cn, fmtClock, timeAgo } from '@/lib/utils'
 import { Badge, DifficultyBadge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/inputs'
 import { Progress } from '@/components/ui/inputs'
+
+type SortKey = 'priority' | 'id' | 'difficulty' | 'attempts' | 'recent' | 'time'
+const DIFF_RANK = { Easy: 0, Medium: 1, Hard: 2 } as const
 
 const DIFFS = ['Easy', 'Medium', 'Hard'] as const
 const STATUS = ['Unsolved', 'Solved', 'Due'] as const
@@ -37,7 +48,12 @@ function Chip({
 
 export function ProblemsPage() {
   const navigate = useNavigate()
-  const { data: problems = [], isLoading } = useQuery({
+  const {
+    data: problems = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ['problems'],
     queryFn: api.problems,
   })
@@ -46,27 +62,53 @@ export function ProblemsPage() {
   const [diff, setDiff] = useState<string | null>(null)
   const [status, setStatus] = useState<string | null>(null)
   const [prioOnly, setPrioOnly] = useState(false)
+  const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({
+    key: 'priority',
+    dir: 1,
+  })
 
   const topics = useMemo(
     () => [...new Set(problems.flatMap((p) => p.topics))].sort(),
     [problems],
   )
 
-  const filtered = useMemo(
-    () =>
-      problems.filter((p) => {
-        if (q && !`${p.id} ${p.title}`.toLowerCase().includes(q.toLowerCase()))
-          return false
-        if (topic && !p.topics.includes(topic)) return false
-        if (diff && p.difficulty !== diff) return false
-        if (status === 'Solved' && !p.solved) return false
-        if (status === 'Unsolved' && p.solved) return false
-        if (status === 'Due' && !p.due_for_review) return false
-        if (prioOnly && p.snowflake_priority !== 1) return false
-        return true
-      }),
-    [problems, q, topic, diff, status, prioOnly],
-  )
+  const toggleSort = (key: SortKey) =>
+    setSort((s) => (s.key === key ? { key, dir: (s.dir * -1) as 1 | -1 } : { key, dir: 1 }))
+
+  const filtered = useMemo(() => {
+    const rows = problems.filter((p) => {
+      if (q && !`${p.id} ${p.title}`.toLowerCase().includes(q.toLowerCase()))
+        return false
+      if (topic && !p.topics.includes(topic)) return false
+      if (diff && p.difficulty !== diff) return false
+      if (status === 'Solved' && !p.solved) return false
+      if (status === 'Unsolved' && p.solved) return false
+      if (status === 'Due' && !p.due_for_review) return false
+      if (prioOnly && p.snowflake_priority !== 1) return false
+      return true
+    })
+    const val = (p: ProblemSummary): number | string => {
+      switch (sort.key) {
+        case 'id':
+          return p.id ?? 0
+        case 'difficulty':
+          return DIFF_RANK[p.difficulty]
+        case 'attempts':
+          return p.attempts
+        case 'recent':
+          return p.last_submitted_at ? Date.parse(p.last_submitted_at) : 0
+        case 'time':
+          return p.solve_seconds ?? Number.MAX_SAFE_INTEGER
+        default:
+          return p.snowflake_priority * 1e7 + (p.id ?? 0)
+      }
+    }
+    return rows.sort((a, b) => {
+      const va = val(a)
+      const vb = val(b)
+      return va < vb ? -sort.dir : va > vb ? sort.dir : 0
+    })
+  }, [problems, q, topic, diff, status, prioOnly, sort])
 
   const solved = problems.filter((p) => p.solved).length
 
@@ -119,28 +161,44 @@ export function ProblemsPage() {
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-line bg-panel">
+      <div className="overflow-x-auto rounded-xl border border-line bg-panel">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-ink-faint">
               <th className="w-10 px-4 py-2.5" />
-              <th className="px-3 py-2.5">Title</th>
-              <th className="px-3 py-2.5">Difficulty</th>
+              <SortTh label="Title" active={sort} k="id" onSort={toggleSort} />
+              <SortTh label="Difficulty" active={sort} k="difficulty" onSort={toggleSort} />
               <th className="px-3 py-2.5">Topics</th>
-              <th className="px-3 py-2.5 text-right">Priority</th>
+              <SortTh label="Attempts" active={sort} k="attempts" onSort={toggleSort} className="text-right" />
+              <SortTh label="Best time" active={sort} k="time" onSort={toggleSort} className="text-right" />
+              <SortTh label="Last tried" active={sort} k="recent" onSort={toggleSort} className="text-right" />
+              <SortTh label="Priority" active={sort} k="priority" onSort={toggleSort} className="text-right" />
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-ink-dim">
+                <td colSpan={8} className="px-4 py-10 text-center text-ink-dim">
                   Loading bank…
                 </td>
               </tr>
             )}
-            {!isLoading && filtered.length === 0 && (
+            {isError && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-ink-dim">
+                <td colSpan={8} className="px-4 py-10 text-center text-ink-dim">
+                  Couldn't reach the backend.{' '}
+                  <button
+                    onClick={() => refetch()}
+                    className="cursor-pointer text-accent hover:underline"
+                  >
+                    Retry
+                  </button>
+                </td>
+              </tr>
+            )}
+            {!isLoading && !isError && filtered.length === 0 && (
+              <tr>
+                <td colSpan={8} className="px-4 py-10 text-center text-ink-dim">
                   Nothing matches those filters.
                 </td>
               </tr>
@@ -152,6 +210,38 @@ export function ProblemsPage() {
         </table>
       </div>
     </main>
+  )
+}
+
+function SortTh({
+  label,
+  k,
+  active,
+  onSort,
+  className,
+}: {
+  label: string
+  k: SortKey
+  active: { key: SortKey; dir: 1 | -1 }
+  onSort: (k: SortKey) => void
+  className?: string
+}) {
+  const on = active.key === k
+  return (
+    <th className={cn('px-3 py-2.5', className)}>
+      <button
+        onClick={() => onSort(k)}
+        className={cn(
+          'inline-flex cursor-pointer items-center gap-1 uppercase tracking-wider hover:text-ink',
+          on ? 'text-ink' : 'text-ink-faint',
+          className?.includes('text-right') && 'flex-row-reverse',
+        )}
+      >
+        {label}
+        {on &&
+          (active.dir === 1 ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}
+      </button>
+    </th>
   )
 }
 
@@ -189,6 +279,23 @@ function Row({ p, onClick }: { p: ProblemSummary; onClick: () => void }) {
             <Badge key={t}>{t}</Badge>
           ))}
         </div>
+      </td>
+      <td className="px-3 py-2.5 text-right text-[13px] text-ink-dim tabular-nums">
+        {p.attempts || '—'}
+      </td>
+      <td
+        className={cn(
+          'px-3 py-2.5 text-right text-[13px] tabular-nums',
+          p.solve_seconds != null && p.solve_seconds > 25 * 60
+            ? 'text-medium'
+            : 'text-ink-dim',
+        )}
+        title={p.solve_seconds != null ? 'First-AC solve time vs 25-min target' : ''}
+      >
+        {p.solve_seconds != null ? fmtClock(p.solve_seconds) : '—'}
+      </td>
+      <td className="px-3 py-2.5 text-right text-xs text-ink-faint">
+        {p.last_submitted_at ? timeAgo(p.last_submitted_at) : '—'}
       </td>
       <td className="px-3 py-2.5 text-right">
         {p.snowflake_priority === 1 ? (

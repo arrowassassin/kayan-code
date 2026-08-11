@@ -10,7 +10,9 @@ import sys
 import tempfile
 
 HARNESS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "harness.py")
-BACKSTOP_SLACK = 10  # seconds beyond sum of per-test limits
+BACKSTOP_SLACK = 10   # seconds beyond sum of per-test limits
+BACKSTOP_MAX = 120    # absolute ceiling regardless of case count
+MAX_CUSTOM_CASES = 25
 
 
 def run_cases(user_code, cases, judge_cfg, checker_src=None):
@@ -24,7 +26,7 @@ def run_cases(user_code, cases, judge_cfg, checker_src=None):
         "checker_src": checker_src,
     }
     time_limit = float(judge_cfg.get("time_limit", 3.0))
-    backstop = time_limit * max(1, len(cases)) + BACKSTOP_SLACK
+    backstop = min(time_limit * max(1, len(cases)) + BACKSTOP_SLACK, BACKSTOP_MAX)
 
     with tempfile.TemporaryDirectory(prefix="kayan-judge-") as tmp:
         payload_path = os.path.join(tmp, "payload.json")
@@ -64,9 +66,9 @@ def load_problem(problem_dir):
 
 
 def materialize_case(case):
-    """Support programmatic cases: 'input_py' / 'expected_py' hold Python
-    expressions (evaluated here, trusted repo content) so large stress tests
-    stay compact in tests.json."""
+    """Programmatic cases: 'input_py' / 'expected_py' hold Python expressions
+    so large stress tests stay compact in tests.json. ONLY ever called on
+    repo-loaded cases — never on API-supplied ones (that would be RCE)."""
     if "input_py" not in case and "expected_py" not in case:
         return case
     out = dict(case)
@@ -77,16 +79,30 @@ def materialize_case(case):
     return out
 
 
+def sanitize_custom_case(case):
+    """API-supplied cases carry data only: drop every key except input/
+    expected (in particular input_py/expected_py, which would be eval'd)."""
+    if not isinstance(case, dict) or not isinstance(case.get("input"), list):
+        raise ValueError(
+            "Each custom case must be an object with an 'input' array of "
+            "arguments (and optionally 'expected').")
+    out = {"input": case["input"]}
+    if "expected" in case:
+        out["expected"] = case["expected"]
+    return out
+
+
 def judge_submission(problem_dir, user_code, include_hidden=True, custom_cases=None):
     """Judge a run (visible/custom cases) or submission (visible + hidden)."""
     meta, tests, checker_src = load_problem(problem_dir)
     if custom_cases is not None:
-        cases = custom_cases
+        if len(custom_cases) > MAX_CUSTOM_CASES:
+            raise ValueError(f"At most {MAX_CUSTOM_CASES} custom cases per run.")
+        cases = [sanitize_custom_case(c) for c in custom_cases]
     else:
-        cases = list(tests.get("visible", []))
-        if include_hidden:
-            cases += tests.get("hidden", [])
-    cases = [materialize_case(c) for c in cases]
+        cases = [materialize_case(c) for c in
+                 list(tests.get("visible", []))
+                 + (tests.get("hidden", []) if include_hidden else [])]
     result = run_cases(user_code, cases, meta["judge"], checker_src)
     if result["status"] == "ok":
         n_visible = len(tests.get("visible", [])) if custom_cases is None else len(cases)

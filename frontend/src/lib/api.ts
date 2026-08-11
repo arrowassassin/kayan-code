@@ -14,6 +14,8 @@ export interface ProblemSummary {
   solved: boolean
   attempted: boolean
   attempts: number
+  last_submitted_at: string | null
+  solve_seconds: number | null
   due_for_review: boolean
 }
 
@@ -101,6 +103,8 @@ export interface Stats {
   topics: Record<string, { total: number; solved: number; attempted: number }>
   review_queue: { slug: string; due_at: string; last_result: string }[]
   activity: Record<string, number>
+  solve_times: { slug: string; seconds: number }[]
+  median_solve_seconds: number | null
 }
 
 export interface Daily {
@@ -158,10 +162,18 @@ export const api = {
     mode = 'practice',
     mock_session_id?: string,
     language = 'python',
+    elapsed_s?: number,
   ) =>
     request<JudgeResult>('/api/submit', {
       method: 'POST',
-      body: JSON.stringify({ slug, code, mode, mock_session_id, language }),
+      body: JSON.stringify({
+        slug,
+        code,
+        mode,
+        mock_session_id,
+        language,
+        elapsed_s,
+      }),
     }),
   submissions: (slug?: string) =>
     request<SubmissionRow[]>(`/api/submissions${slug ? `?slug=${slug}` : ''}`),

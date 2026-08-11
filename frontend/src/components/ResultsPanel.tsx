@@ -18,12 +18,45 @@ const verdictColor: Record<string, string> = {
   TLE: 'text-medium',
 }
 
-function J({ v }: { v: unknown }) {
+/** first index where two JSON strings diverge, for highlighting mismatches */
+function firstDiff(a: string, b: string) {
+  const n = Math.min(a.length, b.length)
+  for (let i = 0; i < n; i++) if (a[i] !== b[i]) return i
+  return a.length === b.length ? -1 : n
+}
+
+function J({ v, diffAt }: { v: unknown; diffAt?: number }) {
+  const s = v === undefined ? '—' : JSON.stringify(v)
   return (
     <pre className="m-0 whitespace-pre-wrap break-all rounded-lg border border-line bg-bg2 px-3 py-2 font-mono text-[13px]">
-      {v === undefined ? '—' : JSON.stringify(v)}
+      {diffAt !== undefined && diffAt >= 0 && diffAt < s.length ? (
+        <>
+          {s.slice(0, diffAt)}
+          <mark className="rounded bg-hard/40 text-ink">{s.slice(diffAt, diffAt + 1)}</mark>
+          {s.slice(diffAt + 1)}
+        </>
+      ) : (
+        s
+      )}
     </pre>
   )
+}
+
+function pyRepr(v: unknown): string {
+  if (v === null) return 'None'
+  if (v === true) return 'True'
+  if (v === false) return 'False'
+  if (Array.isArray(v)) return '[' + v.map(pyRepr).join(', ') + ']'
+  if (typeof v === 'string') return JSON.stringify(v)
+  if (typeof v === 'object')
+    return (
+      '{' +
+      Object.entries(v as object)
+        .map(([k, val]) => `${JSON.stringify(k)}: ${pyRepr(val)}`)
+        .join(', ') +
+      '}'
+    )
+  return String(v)
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -37,8 +70,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   )
 }
 
-export function ResultsPanel({ result }: { result: JudgeResult }) {
+export function ResultsPanel({
+  result,
+  entry,
+}: {
+  result: JudgeResult
+  entry?: string
+}) {
   const [sel, setSel] = useState(0)
+  const [copied, setCopied] = useState(false)
 
   if (result.status === 'error') {
     return (
@@ -116,6 +156,20 @@ export function ResultsPanel({ result }: { result: JudgeResult }) {
           {c.input !== undefined && (
             <Field label="Input">
               <J v={c.input} />
+              {entry && Array.isArray(c.input) && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `Solution().${entry}(${(c.input as unknown[]).map(pyRepr).join(', ')})`,
+                    )
+                    setCopied(true)
+                    setTimeout(() => setCopied(false), 1500)
+                  }}
+                  className="mt-1 cursor-pointer text-xs text-accent2 hover:underline"
+                >
+                  {copied ? 'Copied ✓' : 'Copy repro call'}
+                </button>
+              )}
             </Field>
           )}
           {c.hidden && c.input === undefined ? (
@@ -126,12 +180,26 @@ export function ResultsPanel({ result }: { result: JudgeResult }) {
             <>
               {c.verdict !== 'RE' && (
                 <Field label="Your output">
-                  <J v={c.output} />
+                  <J
+                    v={c.output}
+                    diffAt={
+                      c.verdict === 'WA' && c.expected !== undefined
+                        ? firstDiff(JSON.stringify(c.output), JSON.stringify(c.expected))
+                        : undefined
+                    }
+                  />
                 </Field>
               )}
               {c.expected !== undefined && c.expected !== null && (
                 <Field label="Expected">
-                  <J v={c.expected} />
+                  <J
+                    v={c.expected}
+                    diffAt={
+                      c.verdict === 'WA'
+                        ? firstDiff(JSON.stringify(c.expected), JSON.stringify(c.output))
+                        : undefined
+                    }
+                  />
                 </Field>
               )}
             </>

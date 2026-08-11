@@ -12,9 +12,10 @@ import {
   RotateCcw,
   UploadCloud,
 } from 'lucide-react'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import { api, type JudgeResult, type TestCase } from '@/lib/api'
 import { LANGUAGES, langById, starterFor } from '@/lib/languages'
-import { cn, fmtMs, timeAgo } from '@/lib/utils'
+import { cn, fmtClock, fmtMs, timeAgo } from '@/lib/utils'
 import { Badge, DifficultyBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -26,19 +27,58 @@ import { AIReviewButton } from '@/components/AIReview'
 
 type UiMode = EditorMode | 'whiteboard'
 
-function useSavedCode(slug: string, starter: string | undefined) {
-  const key = `kayan-code:${slug}`
+const TARGET_SECONDS = 25 * 60 // Medium target: 25 minutes
+
+/** Practice stopwatch: starts on first keystroke, persists per slug. */
+function useStopwatch(slug: string) {
+  const key = `kayan-timer:${slug}`
+  const [startedAt, setStartedAt] = useState<number | null>(() => {
+    const v = localStorage.getItem(key)
+    return v ? Number(v) : null
+  })
+  const [nowTick, setNowTick] = useState(Date.now())
+  useEffect(() => {
+    const v = localStorage.getItem(key)
+    setStartedAt(v ? Number(v) : null)
+  }, [key])
+  useEffect(() => {
+    if (startedAt === null) return
+    const t = setInterval(() => setNowTick(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [startedAt])
+  const start = () => {
+    if (localStorage.getItem(key)) return
+    const ts = Date.now()
+    localStorage.setItem(key, String(ts))
+    setStartedAt(ts)
+  }
+  const reset = () => {
+    localStorage.removeItem(key)
+    setStartedAt(null)
+  }
+  const elapsed =
+    startedAt === null ? 0 : Math.floor((nowTick - startedAt) / 1000)
+  return { elapsed, running: startedAt !== null, start, reset }
+}
+
+function useSavedCode(cacheKey: string, starter: string | undefined) {
+  const key = `kayan-code:${cacheKey}`
   const [code, setCode] = useState<string>('')
-  const loaded = useRef(false)
+  // the key that `code` currently belongs to — guards the persist effect from
+  // writing the old language's code into a freshly-switched key.
+  const codeKey = useRef<string | null>(null)
+
   useEffect(() => {
     if (starter === undefined) return
     const saved = localStorage.getItem(key)
     setCode(saved ?? starter)
-    loaded.current = true
-  }, [slug, starter]) // eslint-disable-line react-hooks/exhaustive-deps
+    codeKey.current = key
+  }, [key, starter])
+
   useEffect(() => {
-    if (loaded.current && code) localStorage.setItem(key, code)
+    if (codeKey.current === key && code) localStorage.setItem(key, code)
   }, [key, code])
+
   return [code, setCode] as const
 }
 
@@ -55,41 +95,59 @@ export function Workspace({
   mock?: {
     sessionId: string
     onAccepted?: () => void
+    locked?: boolean
   }
 }) {
+  const locked = mock?.locked ?? false
   const qc = useQueryClient()
   const { data: problem } = useQuery({
     queryKey: ['problem', slug],
     queryFn: () => api.problem(slug),
   })
   const [language, setLanguage] = useState('python')
-  const { data: langStarter } = useQuery({
+  const { data: langStarter, isFetching: starterFetching } = useQuery({
     queryKey: ['starter', slug, language],
     queryFn: () => api.starter(slug, language),
     enabled: !!problem && language !== 'python',
     staleTime: Infinity,
   })
+  // Keep starter undefined until the real per-language stub arrives, so the
+  // saved-code hook never persists the comment-contract fallback over it.
   const starter =
     problem === undefined
       ? undefined
       : language === 'python'
         ? problem.starter
-        : (langStarter?.starter ??
-          starterFor(langById(language), problem.starter))
+        : langStarter?.starter ??
+          (starterFetching
+            ? undefined
+            : starterFor(langById(language), problem.starter))
   const [code, setCode] = useSavedCode(`${slug}:${language}`, starter)
   const [uiMode, setUiMode] = useState<UiMode>(mock ? 'interview' : 'practice')
   const [bottomTab, setBottomTab] = useState<'tests' | 'result'>('tests')
   const [result, setResult] = useState<JudgeResult | null>(null)
   const [cases, setCases] = useState<TestCase[] | null>(null)
+  const [fontSize, setFontSize] = useState(() =>
+    Number(localStorage.getItem('kayan-font') ?? 14),
+  )
+  const stopwatch = useStopwatch(slug)
 
   useEffect(() => {
     setResult(null)
     setCases(null)
     setBottomTab('tests')
   }, [slug])
+  useEffect(() => {
+    localStorage.setItem('kayan-font', String(fontSize))
+  }, [fontSize])
 
   const editorMode: EditorMode = uiMode === 'practice' ? 'practice' : 'interview'
   const effectiveCases = cases ?? problem?.visible_tests ?? []
+
+  const onCodeChange = (v: string) => {
+    setCode(v)
+    if (!mock) stopwatch.start() // practice clock starts on first keystroke
+  }
 
   const runMut = useMutation({
     mutationFn: () => api.run(slug, code, cases ?? undefined, language),
@@ -101,14 +159,23 @@ export function Workspace({
   })
   const submitMut = useMutation({
     mutationFn: () =>
-      api.submit(slug, code, mock ? 'mock' : uiMode, mock?.sessionId, language),
+      api.submit(
+        slug,
+        code,
+        mock ? 'mock' : uiMode,
+        mock?.sessionId,
+        language,
+        mock ? undefined : stopwatch.elapsed || undefined,
+      ),
     onSuccess: (r) => {
       setResult(r)
       setBottomTab('result')
       qc.invalidateQueries({ queryKey: ['problems'] })
       qc.invalidateQueries({ queryKey: ['submissions', slug] })
+      qc.invalidateQueries({ queryKey: ['stats'] })
       if (r.verdict === 'AC') {
         toast.success('Accepted 🎉')
+        if (!mock) stopwatch.reset()
         if (mock?.onAccepted) mock.onAccepted()
       } else if (r.status === 'ok') {
         toast.error(`${r.verdict} — ${r.passed}/${r.total} cases passed`)
@@ -117,6 +184,20 @@ export function Workspace({
     onError: (e: Error) => toast.error(e.message),
   })
   const busy = runMut.isPending || submitMut.isPending
+
+  // keyboard: Cmd/Ctrl-Enter = Run, Cmd/Ctrl-Shift-Enter = Submit
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault()
+        if (busy || locked) return
+        if (e.shiftKey) submitMut.mutate()
+        else if (uiMode !== 'whiteboard') runMut.mutate()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [busy, uiMode, code, language, cases]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!problem) {
     return (
@@ -127,9 +208,14 @@ export function Workspace({
   }
 
   return (
-    <main className="grid h-[calc(100vh-56px)] grid-cols-1 gap-3 p-3 lg:grid-cols-[minmax(400px,44%)_1fr]">
+    <PanelGroup
+      direction="horizontal"
+      autoSaveId="kayan-hsplit"
+      className="h-[calc(100vh-56px)] p-3"
+    >
       {/* left: statement / editorial / hints / submissions */}
-      <section className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-panel">
+      <Panel defaultSize={44} minSize={26}>
+      <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-panel">
         <Tabs defaultValue="description" className="flex min-h-0 flex-1 flex-col">
           <TabsList>
             <TabsTrigger value="description">
@@ -178,10 +264,17 @@ export function Workspace({
           </TabsContent>
         </Tabs>
       </section>
+      </Panel>
+
+      <PanelResizeHandle className="group mx-1 flex w-1.5 items-center justify-center">
+        <div className="h-10 w-1 rounded-full bg-line transition-colors group-hover:bg-accent group-data-[resize-handle-state=drag]:bg-accent" />
+      </PanelResizeHandle>
 
       {/* right: editor + tests */}
-      <section className="flex min-h-0 flex-col gap-3">
-        <div className="flex min-h-0 flex-[1.7] flex-col overflow-hidden rounded-xl border border-line bg-panel">
+      <Panel defaultSize={56} minSize={30}>
+      <PanelGroup direction="vertical" autoSaveId="kayan-vsplit" className="gap-0">
+        <Panel defaultSize={62} minSize={20}>
+        <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-panel">
           <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-3 py-2">
             {mock ? (
               <span className="font-mono text-[12.5px] text-ink-faint">python3</span>
@@ -230,12 +323,42 @@ export function Workspace({
                 interview editor — assists off
               </Badge>
             )}
-            <div className="ml-auto flex gap-2">
+            <div className="ml-auto flex items-center gap-2">
+              {!mock && (
+                <span
+                  className={cn(
+                    'font-mono text-[13px] tabular-nums',
+                    stopwatch.elapsed >= TARGET_SECONDS
+                      ? 'text-medium'
+                      : 'text-ink-faint',
+                  )}
+                  title="Practice stopwatch — starts on your first keystroke; amber past the 25-min Medium target"
+                >
+                  {stopwatch.running ? fmtClock(stopwatch.elapsed) : '25:00 target'}
+                </span>
+              )}
+              <div className="flex items-center rounded-lg border border-line text-ink-dim">
+                <button
+                  onClick={() => setFontSize((f) => Math.max(11, f - 1))}
+                  className="cursor-pointer px-2 py-1 text-xs hover:text-ink"
+                  title="Smaller font"
+                >
+                  A-
+                </button>
+                <button
+                  onClick={() => setFontSize((f) => Math.min(22, f + 1))}
+                  className="cursor-pointer px-2 py-1 text-sm hover:text-ink"
+                  title="Larger font"
+                >
+                  A+
+                </button>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => {
                   setCode(starter ?? problem.starter)
+                  if (!mock) stopwatch.reset()
                   toast('Reset to starter code')
                 }}
               >
@@ -246,14 +369,23 @@ export function Workspace({
           <div className="min-h-0 flex-1 overflow-auto">
             <CodeEditor
               value={code}
-              onChange={setCode}
+              onChange={onCodeChange}
               mode={editorMode}
               language={mock ? 'python' : language}
+              fontSize={fontSize}
+              readOnly={locked}
             />
           </div>
         </div>
+        </Panel>
 
-        <div className="flex min-h-[190px] flex-1 flex-col overflow-hidden rounded-xl border border-line bg-panel">
+        <PanelResizeHandle className="group my-1 flex h-1.5 items-center justify-center">
+          <div className="h-1 w-10 rounded-full bg-line transition-colors group-hover:bg-accent group-data-[resize-handle-state=drag]:bg-accent" />
+        </PanelResizeHandle>
+
+        <Panel defaultSize={38} minSize={12}>
+
+        <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-line bg-panel">
           <div className="flex shrink-0 items-center border-b border-line px-2.5 pt-1.5">
             <button
               onClick={() => setBottomTab('tests')}
@@ -281,11 +413,11 @@ export function Workspace({
               <Button
                 size="sm"
                 onClick={() => runMut.mutate()}
-                disabled={busy || uiMode === 'whiteboard'}
+                disabled={busy || locked || uiMode === 'whiteboard'}
                 title={
                   uiMode === 'whiteboard'
                     ? 'Whiteboard mode: Run is disabled — submit when confident'
-                    : 'Run against the visible testcases'
+                    : 'Run against the visible testcases  (⌘/Ctrl+Enter)'
                 }
               >
                 {uiMode === 'whiteboard' ? <Lock size={14} /> : <Play size={14} />}
@@ -295,7 +427,8 @@ export function Workspace({
                 variant="primary"
                 size="sm"
                 onClick={() => submitMut.mutate()}
-                disabled={busy}
+                disabled={busy || locked}
+                title="Submit against the full hidden suite  (⌘/Ctrl+Shift+Enter)"
               >
                 <UploadCloud size={14} /> Submit
               </Button>
@@ -311,7 +444,7 @@ export function Workspace({
                 edited={cases !== null}
               />
             ) : result ? (
-              <ResultsPanel result={result} />
+              <ResultsPanel result={result} entry={problem.judge?.entry} />
             ) : (
               <div className="p-5 text-[13.5px] text-ink-faint">
                 {busy ? 'Judging…' : 'Run or submit to see results.'}
@@ -319,8 +452,10 @@ export function Workspace({
             )}
           </div>
         </div>
-      </section>
-    </main>
+        </Panel>
+      </PanelGroup>
+      </Panel>
+    </PanelGroup>
   )
 }
 

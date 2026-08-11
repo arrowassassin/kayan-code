@@ -16,12 +16,14 @@ export function CodeEditor({
   mode,
   language = 'python',
   readOnly = false,
+  fontSize = 14,
 }: {
   value: string
   onChange: (v: string) => void
   mode: EditorMode
   language?: string
   readOnly?: boolean
+  fontSize?: number
 }) {
   const basicSetup = useMemo(
     () =>
@@ -54,6 +56,11 @@ export function CodeEditor({
     [mode],
   )
 
+  const fontTheme = useMemo(
+    () => EditorView.theme({ '&': { fontSize: `${fontSize}px` } }),
+    [fontSize],
+  )
+
   return (
     <div className="cm-fill h-full min-h-0">
       <CodeMirror
@@ -63,7 +70,7 @@ export function CodeEditor({
         theme={oneDark}
         readOnly={readOnly}
         basicSetup={basicSetup}
-        extensions={[langById(language).extension(), EditorView.lineWrapping]}
+        extensions={[langById(language).extension(), EditorView.lineWrapping, fontTheme]}
       />
     </div>
   )

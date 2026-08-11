@@ -130,6 +130,17 @@ function LiveSession({ session, onAbandon }: { session: MockSession; onAbandon: 
   const [activeSlug, setActiveSlug] = useState(session.warmup_slug)
   const timeUp = remaining <= 0
 
+  // hard stop: at 0:00 the editor locks, like the real round's clock cutoff
+  const warnedRef = useRef(false)
+  useEffect(() => {
+    if (timeUp && !warnedRef.current && session.stage === 'coding') {
+      warnedRef.current = true
+      toast.error("Time's up — the editor is locked. Finish for your debrief.", {
+        duration: 15_000,
+      })
+    }
+  }, [timeUp, session.stage])
+
   const refresh = () => qc.invalidateQueries({ queryKey: ['mock', session.id] })
 
   return (
@@ -180,12 +191,22 @@ function LiveSession({ session, onAbandon }: { session: MockSession; onAbandon: 
       )}
       {session.stage === 'approach' && <ApproachGate session={session} onDone={refresh} />}
       {session.stage === 'coding' && (
-        <div className="min-h-0 flex-1">
+        <div className="relative min-h-0 flex-1">
           <Workspace
             key={activeSlug}
             slug={activeSlug}
-            mock={{ sessionId: session.id, onAccepted: refresh }}
+            mock={{ sessionId: session.id, onAccepted: refresh, locked: timeUp }}
           />
+          {timeUp && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-bg/70 backdrop-blur-sm">
+              <p className="text-lg font-bold">⏱ Time's up</p>
+              <p className="max-w-sm text-center text-sm text-ink-dim">
+                The 60 minutes are done. Editing and submitting are locked —
+                open your debrief to self-review and get the AI report.
+              </p>
+              <FinishButton session={session} label="Open debrief" />
+            </div>
+          )}
         </div>
       )}
     </div>
