@@ -1,0 +1,12 @@
+{
+  "id": 151,
+  "title": "Reverse Words in a String",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "reverseWords",
+    "compare": "exact"
+  }
+}

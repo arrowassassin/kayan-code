@@ -1,0 +1,12 @@
+{
+  "id": 68,
+  "title": "Text Justification",
+  "difficulty": "Hard",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "fullJustify",
+    "compare": "exact"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "visible": [
+    { "input": ["aeiouu"], "expected": 2 },
+    { "input": ["cuaieuouac"], "expected": 7 },
+    { "input": ["duckgoose"], "expected": 0 }
+  ],
+  "hidden": [
+    { "input": ["a"], "expected": 0 },
+    { "input": ["aeiou"], "expected": 1 },
+    { "input": ["aeio"], "expected": 0 },
+    { "input": ["aeeiiouua"], "expected": 5 },
+    { "input": ["eaioaeiouu"], "expected": 10 },
+    { "input": ["aeiouaeiou"], "expected": 21 },
+    { "input": ["poazaeuioauoiu"], "expected": 11 },
+    { "input": ["bcdfg"], "expected": 0 },
+    { "input": ["eeeeeeeeeeeeeeeeeeee"], "expected": 0 },
+    { "input": ["aeiobu"], "expected": 0 },
+    { "input": ["aeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiouaeiou"], "expected": 4656 }
+  ]
+}

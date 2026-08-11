@@ -1,0 +1,12 @@
+{
+  "id": 165,
+  "title": "Compare Version Numbers",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "compareVersion",
+    "compare": "exact"
+  }
+}

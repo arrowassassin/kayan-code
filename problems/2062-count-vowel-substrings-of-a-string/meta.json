@@ -1,0 +1,12 @@
+{
+  "id": 2062,
+  "title": "Count Vowel Substrings of a String",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 1,
+  "judge": {
+    "mode": "function",
+    "entry": "countVowelSubstrings",
+    "compare": "exact"
+  }
+}

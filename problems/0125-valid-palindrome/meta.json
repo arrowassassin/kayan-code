@@ -1,0 +1,13 @@
+{
+  "id": 125,
+  "title": "Valid Palindrome",
+  "difficulty": "Easy",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "follow_up": "0680-valid-palindrome-ii",
+  "judge": {
+    "mode": "function",
+    "entry": "isPalindrome",
+    "compare": "exact"
+  }
+}

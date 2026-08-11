@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": ["3[a]2[bc]"], "expected": "aaabcbc" },
+    { "input": ["3[a2[c]]"], "expected": "accaccacc" },
+    { "input": ["2[abc]3[cd]ef"], "expected": "abcabccdcdcdef" }
+  ],
+  "hidden": [
+    { "input": ["abc"], "expected": "abc" },
+    { "input": ["z"], "expected": "z" },
+    { "input": ["10[a]"], "expected": "aaaaaaaaaa" },
+    { "input": ["2[b3[a]]x"], "expected": "baaabaaax" },
+    { "input": ["100[x]"], "expected": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" },
+    { "input": ["2[2[2[2[ab]]]]"], "expected": "abababababababababababababababab" },
+    { "input_py": "['9[9[9[9[9[ab]]]]]']", "expected_py": "'ab' * 9**5" },
+    { "input_py": "['300[' + 'ab' * 15 + ']']", "expected_py": "'ab' * 15 * 300" }
+  ]
+}

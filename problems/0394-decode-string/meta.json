@@ -1,0 +1,13 @@
+{
+  "id": 394,
+  "title": "Decode String",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "follow_up": "0227-basic-calculator-ii",
+  "judge": {
+    "mode": "function",
+    "entry": "decodeString",
+    "compare": "exact"
+  }
+}

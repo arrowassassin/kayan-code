@@ -1,0 +1,12 @@
+{
+  "id": 937,
+  "title": "Reorder Data in Log Files",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "reorderLogFiles",
+    "compare": "exact"
+  }
+}

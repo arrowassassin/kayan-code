@@ -1,0 +1,21 @@
+{
+  "visible": [
+    { "input": ["A man, a plan, a canal: Panama"], "expected": true },
+    { "input": ["race a car"], "expected": false },
+    { "input": [".,"], "expected": true }
+  ],
+  "hidden": [
+    { "input": [""], "expected": true },
+    { "input": [" "], "expected": true },
+    { "input": ["0P"], "expected": false },
+    { "input": ["ab_a"], "expected": true },
+    { "input": ["0_0"], "expected": true },
+    { "input": ["1a2"], "expected": false },
+    { "input": ["Able was I ere I saw Elba"], "expected": true },
+    { "input": ["a."], "expected": true },
+    { "input": ["12321"], "expected": true },
+    { "input_py": "['ab' * 50000 + 'ba' * 50000]", "expected": true },
+    { "input_py": "['ab' * 50000 + 'x' + 'ba' * 50000]", "expected": true },
+    { "input_py": "['ab' * 50000 + 'xy' + 'ba' * 50000]", "expected": false }
+  ]
+}

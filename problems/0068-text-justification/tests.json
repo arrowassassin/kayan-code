@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [["This","is","an","example","of","text","justification."], 16], "expected": ["This    is    an", "example  of text", "justification.  "] },
+    { "input": [["What","must","be","acknowledgment","shall","be"], 16], "expected": ["What   must   be", "acknowledgment  ", "shall be        "] }
+  ],
+  "hidden": [
+    { "input": [["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"], 20], "expected": ["Science  is  what we", "understand      well", "enough to explain to", "a  computer.  Art is", "everything  else  we", "do                  "] },
+    { "input": [["a"], 3], "expected": ["a  "] },
+    { "input": [["hello"], 5], "expected": ["hello"] },
+    { "input": [["a","b","c","d","e"], 3], "expected": ["a b", "c d", "e  "] },
+    { "input": [["equal","width","words","line"], 11], "expected": ["equal width", "words line "] },
+    { "input": [["exactfit"], 8], "expected": ["exactfit"] },
+    { "input": [["a","b"], 4], "expected": ["a b "] },
+    { "input": [["ab","cd","ef"], 2], "expected": ["ab", "cd", "ef"] }
+  ]
+}

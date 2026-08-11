@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": ["the sky is blue"], "expected": "blue is sky the" },
+    { "input": ["  hello world  "], "expected": "world hello" },
+    { "input": ["a good   example"], "expected": "example good a" }
+  ],
+  "hidden": [
+    { "input": ["one"], "expected": "one" },
+    { "input": ["   padded   "], "expected": "padded" },
+    { "input": ["a b"], "expected": "b a" },
+    { "input": ["  multiple   gaps  here "], "expected": "here gaps multiple" },
+    { "input": ["x2, y7!  ok"], "expected": "ok y7! x2," },
+    { "input": ["A"], "expected": "A" },
+    { "input": ["word  word"], "expected": "word word" },
+    { "input_py": "[' '.join('w%d' % i for i in range(20000))]", "expected_py": "' '.join('w%d' % i for i in range(19999, -1, -1))" }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": ["Bob hit a ball, the hit BALL flew far after it was hit.", ["hit"]], "expected": "ball" },
+    { "input": ["a.", []], "expected": "a" }
+  ],
+  "hidden": [
+    { "input": ["a, a, a, a, b,b,b,c, c", ["a"]], "expected": "b" },
+    { "input": ["Bob. hIt, baLl", ["bob", "hit"]], "expected": "ball" },
+    { "input": ["x!x!!x?y y", []], "expected": "x" },
+    { "input": ["Wow; such...parsing;such Punctuation, such!", ["punctuation"]], "expected": "such" },
+    { "input": ["can't can't t", []], "expected": "t" },
+    { "input": ["one", []], "expected": "one" },
+    { "input": ["It was the best of times, it was the worst of times.", ["it", "was", "the", "of"]], "expected": "times" },
+    { "input": ["a a b b a", ["a"]], "expected": "b" },
+    { "input": ["Hello!hello?HELLO.world", []], "expected": "hello" }
+  ]
+}

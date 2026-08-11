@@ -1,0 +1,19 @@
+{
+  "visible": [
+    { "input": ["/home//foo/"], "expected": "/home/foo" },
+    { "input": ["/a/./b/../../c/"], "expected": "/c" },
+    { "input": ["/../"], "expected": "/" }
+  ],
+  "hidden": [
+    { "input": ["/"], "expected": "/" },
+    { "input": ["/////"], "expected": "/" },
+    { "input": ["/..."], "expected": "/..." },
+    { "input": ["/.hidden/./x/.."], "expected": "/.hidden" },
+    { "input": ["/home/"], "expected": "/home" },
+    { "input": ["/a/../../b/../c//.//"], "expected": "/c" },
+    { "input": ["/a//b////c/d//././/.."], "expected": "/a/b/c" },
+    { "input": ["/x/.."], "expected": "/" },
+    { "input": ["/a/.././.."], "expected": "/" },
+    { "input": ["/_1/./a..b/..../"], "expected": "/_1/a..b/...." }
+  ]
+}

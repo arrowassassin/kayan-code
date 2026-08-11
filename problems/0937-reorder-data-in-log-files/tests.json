@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [["dig1 8 1 5 1","let1 art can","dig2 3 6","let2 own kit dig","let3 art zero"]], "expected": ["let1 art can","let3 art zero","let2 own kit dig","dig1 8 1 5 1","dig2 3 6"] },
+    { "input": [["j mo","5 m w"]], "expected": ["5 m w","j mo"] }
+  ],
+  "hidden": [
+    { "input": [["a1 9 2 3 1","g1 act car","zo4 4 7","ab1 off key dog","a8 act zoo"]], "expected": ["g1 act car","a8 act zoo","ab1 off key dog","a1 9 2 3 1","zo4 4 7"] },
+    { "input": [["l5 act act","l2 act act","l1 zzz","d1 1","d2 2","l3 act act act"]], "expected": ["l2 act act","l5 act act","l3 act act act","l1 zzz","d1 1","d2 2"] },
+    { "input": [["1 n u","r 527","j 893","a1 9 2 3 1"]], "expected": ["1 n u","r 527","j 893","a1 9 2 3 1"] },
+    { "input": [["z9 99 88","y8 77 66","x7 55 44"]], "expected": ["z9 99 88","y8 77 66","x7 55 44"] },
+    { "input": [["only1 letters here"]], "expected": ["only1 letters here"] },
+    { "input": [["b bb","a bb","c aa"]], "expected": ["c aa","a bb","b bb"]},
+    { "input": [["id1 ab","id2 a b"]], "expected": ["id2 a b","id1 ab"] },
+    { "input": [["w2 alpha","w1 1 2 3","w3 alpha"]], "expected": ["w2 alpha","w3 alpha","w1 1 2 3"] }
+  ]
+}

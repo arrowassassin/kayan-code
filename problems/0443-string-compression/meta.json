@@ -1,0 +1,12 @@
+{
+  "id": 443,
+  "title": "String Compression",
+  "difficulty": "Medium",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "compress",
+    "compare": "exact"
+  }
+}

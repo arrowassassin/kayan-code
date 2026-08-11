@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": [["a","a","b","b","c","c","c"]], "expected": ["a","2","b","2","c","3"] },
+    { "input": [["a"]], "expected": ["a"] },
+    { "input": [["a","b","b","b","b","b","b","b","b","b","b","b","b"]], "expected": ["a","b","1","2"] }
+  ],
+  "hidden": [
+    { "input": [["a","a","a","b","b","a","a"]], "expected": ["a","3","b","2","a","2"] },
+    { "input": [["a","b","c"]], "expected": ["a","b","c"] },
+    { "input": [["o","o","o","o","o","o","o","o","o","o"]], "expected": ["o","1","0"] },
+    { "input": [["Z"]], "expected": ["Z"] },
+    { "input": [["1","1","1"]], "expected": ["1","3"] },
+    { "input": [["a","A","a","A"]], "expected": ["a","A","a","A"] },
+    { "input_py": "[['z'] * 1500 + ['y'] + ['x'] * 99]", "expected_py": "['z','1','5','0','0','y','x','9','9']" },
+    { "input_py": "[['q'] * 2000]", "expected_py": "['q','2','0','0','0']" }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": 819,
+  "title": "Most Common Word",
+  "difficulty": "Easy",
+  "topics": ["String Parsing"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "mostCommonWord",
+    "compare": "exact"
+  }
+}

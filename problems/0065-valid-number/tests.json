@@ -1,0 +1,37 @@
+{
+  "visible": [
+    { "input": ["-.9"], "expected": true },
+    { "input": ["4e+"], "expected": false },
+    { "input": [" 0.1 "], "expected": true }
+  ],
+  "hidden": [
+    { "input": ["0"], "expected": true },
+    { "input": ["e"], "expected": false },
+    { "input": ["."], "expected": false },
+    { "input": ["+"], "expected": false },
+    { "input": ["e9"], "expected": false },
+    { "input": ["95a54e53"], "expected": false },
+    { "input": ["2e10"], "expected": true },
+    { "input": ["3."], "expected": true },
+    { "input": ["+.8"], "expected": true },
+    { "input": ["46.e3"], "expected": true },
+    { "input": ["-090"], "expected": true },
+    { "input": ["--6"], "expected": false },
+    { "input": ["+-3"], "expected": false },
+    { "input": ["1e"], "expected": false },
+    { "input": ["1 2"], "expected": false },
+    { "input": [".e1"], "expected": false },
+    { "input": ["0089"], "expected": true },
+    { "input": ["2.e-7"], "expected": true },
+    { "input": [""], "expected": false },
+    { "input": ["  "], "expected": false },
+    { "input": ["1E5"], "expected": true },
+    { "input": ["6+1"], "expected": false },
+    { "input": ["-123.456e789"], "expected": true },
+    { "input": [". 1"], "expected": false },
+    { "input": ["4.e2e3"], "expected": false },
+    { "input": ["Infinity"], "expected": false },
+    { "input": ["NaN"], "expected": false },
+    { "input": ["3-2"], "expected": false }
+  ]
+}

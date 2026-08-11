@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [["eat","tea","tan","ate","nat","bat"]], "expected": [["eat","tea","ate"],["tan","nat"],["bat"]] },
+    { "input": [[""]], "expected": [[""]] }
+  ],
+  "hidden": [
+    { "input": [["a"]], "expected": [["a"]] },
+    { "input": [["","b",""]], "expected": [["",""],["b"]] },
+    { "input": [["abc","bca","cab","cba"]], "expected": [["abc","bca","cab","cba"]] },
+    { "input": [["ab","ba","abb","bab","bba","aab"]], "expected": [["ab","ba"],["abb","bab","bba"],["aab"]] },
+    { "input": [["dog","god","dog"]], "expected": [["dog","god","dog"]] },
+    { "input": [["aabb","abab","bbaa","abba","baba","baab"]], "expected": [["aabb","abab","bbaa","abba","baba","baab"]] },
+    { "input": [["x","y","z"]], "expected": [["x"],["y"],["z"]] },
+    { "input_py": "[['abc', 'bca', 'cab'] * 2000]", "expected_py": "[['abc', 'bca', 'cab'] * 2000]" }
+  ]
+}
