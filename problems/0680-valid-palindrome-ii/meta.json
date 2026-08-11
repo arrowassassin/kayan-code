@@ -1,0 +1,13 @@
+{
+  "id": 680,
+  "title": "Valid Palindrome II",
+  "difficulty": "Easy",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0125-valid-palindrome",
+  "judge": {
+    "mode": "function",
+    "entry": "validPalindrome",
+    "compare": "exact"
+  }
+}

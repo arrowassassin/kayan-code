@@ -1,0 +1,13 @@
+{
+  "id": 692,
+  "title": "Top K Frequent Words",
+  "difficulty": "Medium",
+  "topics": ["Top-K / Heap"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0347-top-k-frequent-elements",
+  "judge": {
+    "mode": "function",
+    "entry": "topKFrequent",
+    "compare": "exact"
+  }
+}

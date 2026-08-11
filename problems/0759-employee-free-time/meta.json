@@ -1,0 +1,13 @@
+{
+  "id": 759,
+  "title": "Employee Free Time",
+  "difficulty": "Hard",
+  "topics": ["Intervals"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0057-insert-interval",
+  "judge": {
+    "mode": "function",
+    "entry": "employeeFreeTime",
+    "compare": "exact"
+  }
+}

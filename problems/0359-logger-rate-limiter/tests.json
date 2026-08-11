@@ -1,0 +1,45 @@
+{
+  "visible": [
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[1,"foo"],[2,"bar"],[3,"foo"],[8,"bar"],[10,"foo"],[11,"foo"]]],
+      "expected": [null, true, true, false, false, false, true]
+    },
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[5,"alpha"],[5,"beta"],[5,"alpha"],[15,"alpha"]]],
+      "expected": [null, true, true, false, true]
+    }
+  ],
+  "hidden": [
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[1,"a"],[11,"a"],[20,"a"],[21,"a"]]],
+      "expected": [null, true, true, false, true]
+    },
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[0,"x"],[5,"x"],[10,"x"]]],
+      "expected": [null, true, false, true]
+    },
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[3,"m1"],[3,"m2"],[3,"m3"],[3,"m4"],[3,"m1"]]],
+      "expected": [null, true, true, true, true, false]
+    },
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[0,"boot"],[9,"boot"],[1000000000,"boot"]]],
+      "expected": [null, true, false, true]
+    },
+    {
+      "input": [["Logger","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage","shouldPrintMessage"],
+                [[],[2,"log line 7"],[2,"log line"],[11,"log line 7"],[12,"log line 7"]]],
+      "expected": [null, true, true, false, true]
+    },
+    {
+      "input_py": "[['Logger'] + ['shouldPrintMessage'] * 5000, [[]] + [[i, 'm%d' % (i % 7)] for i in range(5000)]]",
+      "expected_py": "[None] + [(i // 7) % 2 == 0 for i in range(5000)]"
+    }
+  ]
+}

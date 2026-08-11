@@ -1,0 +1,12 @@
+{
+  "id": 239,
+  "title": "Sliding Window Maximum",
+  "difficulty": "Hard",
+  "topics": ["Sliding Window"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "maxSlidingWindow",
+    "compare": "exact"
+  }
+}

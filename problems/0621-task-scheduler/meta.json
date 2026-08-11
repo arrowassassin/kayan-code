@@ -1,0 +1,12 @@
+{
+  "id": 621,
+  "title": "Task Scheduler",
+  "difficulty": "Medium",
+  "topics": ["Top-K / Heap"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "leastInterval",
+    "compare": "exact"
+  }
+}

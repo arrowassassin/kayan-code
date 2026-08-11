@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": ["ADOBECODEBANC", "ABC"], "expected": "BANC" },
+    { "input": ["a", "a"], "expected": "a" },
+    { "input": ["a", "aa"], "expected": "" }
+  ],
+  "hidden": [
+    { "input": ["ab", "b"], "expected": "b" },
+    { "input": ["abc", "cba"], "expected": "abc" },
+    { "input": ["aa", "aa"], "expected": "aa" },
+    { "input": ["bba", "ab"], "expected": "ba" },
+    { "input": ["ADOBECODEBANC", "ABCC"], "expected": "CODEBANC" },
+    { "input": ["cabwefgewcwaefgcf", "cae"], "expected": "cwae" },
+    { "input": ["xyz", "d"], "expected": "" },
+    { "input_py": "['ab' * 50000 + 'c', 'abc']", "expected": "abc" }
+  ]
+}

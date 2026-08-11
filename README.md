@@ -8,7 +8,7 @@ scored). Fully offline, single user, no accounts.
 ## Quick start
 
 ```bash
-pip install fastapi uvicorn httpx python-dotenv
+pip install -r requirements.txt
 uvicorn app:app          # then open http://localhost:8000
 ```
 
@@ -29,6 +29,10 @@ That's it — the built React UI ships in `frontend/dist`. Optional: create
   adds the hidden suite and records history — exactly the LeetCode loop.
 - **Three editor modes**: practice (bracket aids), interview (ALL assists off,
   like CoderPad with assists disabled), whiteboard (Run disabled — submit blind).
+- **Any-language solutions**: pick Java/C++/JS/TS/Go/Rust in the editor and
+  your code is AI-translated to Python before judging (translation shown with
+  the results; needs the OpenRouter key). Mock sessions stay Python-only,
+  because the real round is.
 - **Mock Interview Mode**: 60-min countdown → clarify gate (2–3 questions
   before the editor unlocks) → approach + complexity gate → coding with
   narration nudges every 8 min → follow-up reveal on AC or at T-25min →

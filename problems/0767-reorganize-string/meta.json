@@ -1,0 +1,12 @@
+{
+  "id": 767,
+  "title": "Reorganize String",
+  "difficulty": "Medium",
+  "topics": ["Top-K / Heap"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "reorganizeString",
+    "compare": "exact"
+  }
+}

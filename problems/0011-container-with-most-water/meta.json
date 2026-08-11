@@ -1,0 +1,13 @@
+{
+  "id": 11,
+  "title": "Container With Most Water",
+  "difficulty": "Medium",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 2,
+  "follow_up": "0042-trapping-rain-water",
+  "judge": {
+    "mode": "function",
+    "entry": "maxArea",
+    "compare": "exact"
+  }
+}

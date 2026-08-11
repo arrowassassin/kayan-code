@@ -1,0 +1,50 @@
+{
+  "visible": [
+    {
+      "input": [["MedianFinder","addNum","addNum","findMedian","addNum","findMedian"],
+                [[],[1],[2],[],[3],[]]],
+      "expected": [null,null,null,1.5,null,2.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","findMedian"],
+                [[],[5],[]]],
+      "expected": [null,null,5.0]
+    }
+  ],
+  "hidden": [
+    {
+      "input": [["MedianFinder","addNum","addNum","findMedian","addNum","findMedian","addNum","findMedian","addNum","findMedian"],
+                [[],[5],[4],[],[3],[],[2],[],[1],[]]],
+      "expected": [null,null,null,4.5,null,4.0,null,3.5,null,3.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","findMedian","addNum","findMedian","addNum","findMedian"],
+                [[],[-1],[],[-2],[],[-3],[]]],
+      "expected": [null,null,-1.0,null,-1.5,null,-2.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","addNum","addNum","addNum","findMedian"],
+                [[],[2],[2],[2],[2],[]]],
+      "expected": [null,null,null,null,null,2.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","addNum","findMedian"],
+                [[],[-100000],[100000],[]]],
+      "expected": [null,null,null,0.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","addNum","addNum","findMedian","addNum","findMedian"],
+                [[],[6],[10],[2],[],[6],[]]],
+      "expected": [null,null,null,null,6.0,null,6.0]
+    },
+    {
+      "input": [["MedianFinder","addNum","addNum","addNum","addNum","addNum","findMedian","addNum","findMedian"],
+                [[],[1],[100],[50],[2],[99],[],[3],[]]],
+      "expected": [null,null,null,null,null,null,50.0,null,26.5]
+    },
+    {
+      "input_py": "[['MedianFinder'] + ['addNum'] * 40000 + ['findMedian'], [[]] + [[(i * 7919) % 100001 - 50000] for i in range(40000)] + [[]]]",
+      "expected_py": "[None] * 40001 + [sorted(((i * 7919) % 100001 - 50000) for i in range(40000))[19999:20001][0] / 2 + sorted(((i * 7919) % 100001 - 50000) for i in range(40000))[19999:20001][1] / 2]"
+    }
+  ]
+}

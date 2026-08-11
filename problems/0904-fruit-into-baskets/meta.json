@@ -1,0 +1,13 @@
+{
+  "id": 904,
+  "title": "Fruit Into Baskets",
+  "difficulty": "Medium",
+  "topics": ["Sliding Window"],
+  "snowflake_priority": 3,
+  "follow_up": "0992-subarrays-with-k-different-integers",
+  "judge": {
+    "mode": "function",
+    "entry": "totalFruit",
+    "compare": "exact"
+  }
+}

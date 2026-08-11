@@ -1,0 +1,13 @@
+{
+  "id": 703,
+  "title": "Kth Largest Element in a Stream",
+  "difficulty": "Easy",
+  "topics": ["Stream / Design"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0359-logger-rate-limiter",
+  "judge": {
+    "mode": "methods",
+    "entry": "KthLargest",
+    "compare": "exact"
+  }
+}

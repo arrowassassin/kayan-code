@@ -1,0 +1,45 @@
+{
+  "visible": [
+    {
+      "input": [["HitCounter","hit","hit","hit","getHits","hit","getHits","getHits"],
+                [[],[1],[2],[3],[4],[300],[300],[301]]],
+      "expected": [null, null, null, null, 3, null, 4, 3]
+    },
+    {
+      "input": [["HitCounter","getHits","hit","getHits","getHits","getHits"],
+                [[],[1],[5],[5],[304],[305]]],
+      "expected": [null, 0, null, 1, 1, 0]
+    }
+  ],
+  "hidden": [
+    {
+      "input": [["HitCounter","hit","hit","hit","getHits","getHits","getHits"],
+                [[],[1],[1],[1],[1],[300],[301]]],
+      "expected": [null, null, null, null, 3, 3, 0]
+    },
+    {
+      "input": [["HitCounter","hit","getHits","getHits","getHits"],
+                [[],[7],[306],[307],[10000]]],
+      "expected": [null, null, 1, 0, 0]
+    },
+    {
+      "input": [["HitCounter","hit","hit","getHits"],
+                [[],[1999999999],[2000000000],[2000000000]]],
+      "expected": [null, null, null, 2]
+    },
+    {
+      "input": [["HitCounter","hit","hit","getHits","hit","getHits"],
+                [[],[1],[2],[1000],[1000],[1000]]],
+      "expected": [null, null, null, 0, null, 1]
+    },
+    {
+      "input": [["HitCounter","hit","getHits","hit","getHits","hit","hit","getHits"],
+                [[],[1],[1],[1],[1],[100],[200],[400]]],
+      "expected": [null, null, 1, null, 2, null, null, 1]
+    },
+    {
+      "input_py": "[['HitCounter'] + [op for _ in range(1, 1501) for op in ('hit', 'getHits')], [[]] + [x for i in range(1, 1501) for x in ([i], [i])]]",
+      "expected_py": "[None] + [x for i in range(1, 1501) for x in (None, min(i, 300))]"
+    }
+  ]
+}

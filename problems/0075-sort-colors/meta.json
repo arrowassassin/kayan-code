@@ -1,0 +1,13 @@
+{
+  "id": 75,
+  "title": "Sort Colors",
+  "difficulty": "Medium",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "sortColors",
+    "compare": "exact",
+    "compare_arg": 0
+  }
+}

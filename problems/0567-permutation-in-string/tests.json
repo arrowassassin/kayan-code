@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": ["ab", "eidbaooo"], "expected": true },
+    { "input": ["ab", "eidboaoo"], "expected": false }
+  ],
+  "hidden": [
+    { "input": ["a", "a"], "expected": true },
+    { "input": ["a", "b"], "expected": false },
+    { "input": ["ab", "a"], "expected": false },
+    { "input": ["adc", "dcda"], "expected": true },
+    { "input": ["hello", "ooolleoooleh"], "expected": false },
+    { "input": ["abcabc", "abaccb"], "expected": true },
+    { "input": ["abc", "ccccbbbbaaaa"], "expected": false },
+    { "input_py": "['ab', 'a' * 9999 + 'b']", "expected": true }
+  ]
+}

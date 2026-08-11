@@ -1,0 +1,50 @@
+{
+  "visible": [
+    {
+      "input": [["RandomizedSet","insert","remove","insert","getRandom","remove","insert","getRandom"],
+                [[],[1],[2],[2],[],[1],[2],[]]],
+      "expected": [null, true, false, true, {"$anyOf": [1, 2]}, true, false, 2]
+    },
+    {
+      "input": [["RandomizedSet","insert","getRandom","insert","remove","insert","getRandom"],
+                [[],[5],[],[5],[5],[7],[]]],
+      "expected": [null, true, 5, false, true, true, 7]
+    }
+  ],
+  "hidden": [
+    {
+      "input": [["RandomizedSet","remove","insert","remove","remove","insert","getRandom"],
+                [[],[1],[1],[1],[1],[1],[]]],
+      "expected": [null, false, true, true, false, true, 1]
+    },
+    {
+      "input": [["RandomizedSet","insert","insert","insert","remove","getRandom","remove","getRandom","insert","getRandom"],
+                [[],[1],[2],[3],[2],[],[1],[],[2],[]]],
+      "expected": [null, true, true, true, true, {"$anyOf": [1, 3]}, true, 3, true, {"$anyOf": [2, 3]}]
+    },
+    {
+      "input": [["RandomizedSet","insert","insert","remove","getRandom"],
+                [[],[10],[20],[20],[]]],
+      "expected": [null, true, true, true, 10]
+    },
+    {
+      "input": [["RandomizedSet","insert","insert","remove","getRandom"],
+                [[],[-2147483648],[2147483647],[-2147483648],[]]],
+      "expected": [null, true, true, true, 2147483647]
+    },
+    {
+      "input": [["RandomizedSet","insert","insert","remove","insert","remove","remove","insert","getRandom"],
+                [[],[1],[2],[1],[1],[2],[1],[3],[]]],
+      "expected": [null, true, true, true, true, true, true, true, 3]
+    },
+    {
+      "input": [["RandomizedSet","insert","insert","insert","getRandom","getRandom"],
+                [[],[0],[-5],[9],[],[]]],
+      "expected": [null, true, true, true, {"$anyOf": [0, -5, 9]}, {"$anyOf": [0, -5, 9]}]
+    },
+    {
+      "input_py": "[['RandomizedSet'] + ['insert'] * 3000 + ['remove'] * 3000, [[]] + [[i] for i in range(3000)] + [[i] for i in range(3000)]]",
+      "expected_py": "[None] + [True] * 6000"
+    }
+  ]
+}

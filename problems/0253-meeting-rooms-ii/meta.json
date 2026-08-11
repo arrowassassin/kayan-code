@@ -1,0 +1,13 @@
+{
+  "id": 253,
+  "title": "Meeting Rooms II",
+  "difficulty": "Medium",
+  "topics": ["Intervals"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0435-non-overlapping-intervals",
+  "judge": {
+    "mode": "function",
+    "entry": "minMeetingRooms",
+    "compare": "exact"
+  }
+}

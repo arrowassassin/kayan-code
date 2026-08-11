@@ -1,0 +1,45 @@
+{
+  "visible": [
+    {
+      "input": [["MovingAverage","next","next","next","next"],
+                [[3],[1],[10],[3],[5]]],
+      "expected": [null, 1.0, 5.5, 4.666666666666667, 6.0]
+    },
+    {
+      "input": [["MovingAverage","next","next","next"],
+                [[1],[4],[0],[-3]]],
+      "expected": [null, 4.0, 0.0, -3.0]
+    }
+  ],
+  "hidden": [
+    {
+      "input": [["MovingAverage","next","next","next","next"],
+                [[2],[-5],[5],[-5],[-5]]],
+      "expected": [null, -5.0, 0.0, 0.0, -5.0]
+    },
+    {
+      "input": [["MovingAverage","next","next"],
+                [[1000],[100000],[-100000]]],
+      "expected": [null, 100000.0, 0.0]
+    },
+    {
+      "input": [["MovingAverage","next","next","next","next","next","next"],
+                [[4],[2],[4],[6],[8],[10],[12]]],
+      "expected": [null, 2.0, 3.0, 4.0, 5.0, 7.0, 9.0]
+    },
+    {
+      "input": [["MovingAverage","next","next","next","next","next"],
+                [[3],[7],[7],[7],[7],[7]]],
+      "expected": [null, 7.0, 7.0, 7.0, 7.0, 7.0]
+    },
+    {
+      "input": [["MovingAverage","next","next","next"],
+                [[2],[0],[0],[3]]],
+      "expected": [null, 0.0, 0.0, 1.5]
+    },
+    {
+      "input_py": "[['MovingAverage'] + ['next'] * 10000, [[50]] + [[i] for i in range(10000)]]",
+      "expected_py": "[None] + [sum(range(max(0, i - 49), i + 1)) / min(i + 1, 50) for i in range(10000)]"
+    }
+  ]
+}

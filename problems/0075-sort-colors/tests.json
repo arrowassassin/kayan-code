@@ -1,0 +1,18 @@
+{
+  "visible": [
+    { "input": [[2,0,2,1,1,0]], "expected": [0,0,1,1,2,2] },
+    { "input": [[2,0,1]], "expected": [0,1,2] }
+  ],
+  "hidden": [
+    { "input": [[0]], "expected": [0] },
+    { "input": [[1]], "expected": [1] },
+    { "input": [[2]], "expected": [2] },
+    { "input": [[1,1,1,1]], "expected": [1,1,1,1] },
+    { "input": [[2,2,1,1,0,0]], "expected": [0,0,1,1,2,2] },
+    { "input": [[0,0,0,1,1,2]], "expected": [0,0,0,1,1,2] },
+    { "input": [[2,1,0]], "expected": [0,1,2] },
+    { "input": [[2,0,0,2,0,2,0]], "expected": [0,0,0,0,2,2,2] },
+    { "input": [[1,2,0]], "expected": [0,1,2] },
+    { "input_py": "[[(i * 7 + 3) % 3 for i in range(100000)]]", "expected_py": "sorted((i * 7 + 3) % 3 for i in range(100000))" }
+  ]
+}

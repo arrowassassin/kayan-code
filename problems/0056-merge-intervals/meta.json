@@ -1,0 +1,13 @@
+{
+  "id": 56,
+  "title": "Merge Intervals",
+  "difficulty": "Medium",
+  "topics": ["Intervals"],
+  "snowflake_priority": 1,
+  "follow_up": "0057-insert-interval",
+  "judge": {
+    "mode": "function",
+    "entry": "merge",
+    "compare": "exact"
+  }
+}

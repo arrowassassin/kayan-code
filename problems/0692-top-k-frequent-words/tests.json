@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [["the","sky","is","blue","the","sky","the"], 2], "expected": ["the","sky"] },
+    { "input": [["apple","pear","apple","pear","fig"], 2], "expected": ["apple","pear"] }
+  ],
+  "hidden": [
+    { "input": [["a"], 1], "expected": ["a"] },
+    { "input": [["b","a"], 2], "expected": ["a","b"] },
+    { "input": [["code","code","review","review","ship"], 3], "expected": ["code","review","ship"] },
+    { "input": [["z","y","z","y","z"], 1], "expected": ["z"] },
+    { "input": [["aa","aaa","a"], 3], "expected": ["a","aa","aaa"] },
+    { "input": [["day","night","day","night"], 1], "expected": ["day"] },
+    { "input": [["b","b","b","a","a","c"], 2], "expected": ["b","a"] },
+    { "input_py": "[['w%04d' % (i % 500) for i in range(50000)], 5]", "expected": ["w0000","w0001","w0002","w0003","w0004"] }
+  ]
+}

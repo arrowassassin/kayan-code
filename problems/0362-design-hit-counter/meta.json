@@ -1,0 +1,13 @@
+{
+  "id": 362,
+  "title": "Design Hit Counter",
+  "difficulty": "Medium",
+  "topics": ["Stream / Design"],
+  "snowflake_priority": 1,
+  "follow_up_of": "0346-moving-average-from-data-stream",
+  "judge": {
+    "mode": "methods",
+    "entry": "HitCounter",
+    "compare": "exact"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [["A","A","A","B","B","B"], 2], "expected": 8 },
+    { "input": [["A","A","A","B","B","B"], 0], "expected": 6 }
+  ],
+  "hidden": [
+    { "input": [["A","A","A","A","A","A","B","C","D","E","F","G"], 2], "expected": 16 },
+    { "input": [["A"], 5], "expected": 1 },
+    { "input": [["A","B","C","A","B","C"], 1], "expected": 6 },
+    { "input": [["A","A"], 3], "expected": 5 },
+    { "input": [["A","A","B","B"], 2], "expected": 5 },
+    { "input": [["A","A","A","B","B","C","C"], 2], "expected": 7 },
+    { "input": [["B","B","B"], 100], "expected": 203 },
+    { "input_py": "[['ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i % 26] for i in range(10000)], 25]", "expected": 10000 }
+  ]
+}

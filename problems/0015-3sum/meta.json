@@ -1,0 +1,13 @@
+{
+  "id": 15,
+  "title": "3Sum",
+  "difficulty": "Medium",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0167-two-sum-ii",
+  "judge": {
+    "mode": "function",
+    "entry": "threeSum",
+    "compare": "unordered_2d"
+  }
+}

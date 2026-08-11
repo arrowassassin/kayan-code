@@ -1,0 +1,13 @@
+{
+  "id": 76,
+  "title": "Minimum Window Substring",
+  "difficulty": "Hard",
+  "topics": ["Sliding Window"],
+  "snowflake_priority": 1,
+  "follow_up_of": "0003-longest-substring-without-repeating-characters",
+  "judge": {
+    "mode": "function",
+    "entry": "minWindow",
+    "compare": "exact"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": 424,
+  "title": "Longest Repeating Character Replacement",
+  "difficulty": "Medium",
+  "topics": ["Sliding Window"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "characterReplacement",
+    "compare": "exact"
+  }
+}

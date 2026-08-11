@@ -1,0 +1,12 @@
+{
+  "id": 209,
+  "title": "Minimum Size Subarray Sum",
+  "difficulty": "Medium",
+  "topics": ["Sliding Window"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "minSubArrayLen",
+    "compare": "exact"
+  }
+}

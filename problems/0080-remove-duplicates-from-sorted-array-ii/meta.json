@@ -1,0 +1,12 @@
+{
+  "id": 80,
+  "title": "Remove Duplicates from Sorted Array II",
+  "difficulty": "Medium",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "removeDuplicates",
+    "compare": "exact"
+  }
+}

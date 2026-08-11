@@ -1,0 +1,17 @@
+{
+  "visible": [
+    { "input": ["aab"], "expected": "aba" },
+    { "input": ["aaab"], "expected": "" }
+  ],
+  "hidden": [
+    { "input": ["a"], "expected": "a" },
+    { "input": ["aa"], "expected": "" },
+    { "input": ["ab"], "expected": "ab" },
+    { "input": ["aaabbc"], "expected": "ababca" },
+    { "input": ["vvvlo"], "expected": "vlvov" },
+    { "input": ["zzzzzyyyyy"], "expected": "zyzyzyzyzy" },
+    { "input": ["baaba"], "expected": "ababa" },
+    { "input": ["ccccbbaa"], "expected": "cbcbcaca" },
+    { "input_py": "['a' * 50000 + 'b' * 50000]", "expected_py": "'ab' * 50000" }
+  ]
+}

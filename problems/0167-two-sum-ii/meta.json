@@ -1,0 +1,13 @@
+{
+  "id": 167,
+  "title": "Two Sum II - Input Array Is Sorted",
+  "difficulty": "Easy",
+  "topics": ["Two Pointer"],
+  "snowflake_priority": 2,
+  "follow_up": "0015-3sum",
+  "judge": {
+    "mode": "function",
+    "entry": "twoSum",
+    "compare": "exact"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": ["ABAB", 2], "expected": 4 },
+    { "input": ["AABABBA", 1], "expected": 4 }
+  ],
+  "hidden": [
+    { "input": ["A", 0], "expected": 1 },
+    { "input": ["AAAA", 0], "expected": 4 },
+    { "input": ["ABCDE", 1], "expected": 2 },
+    { "input": ["AABABBA", 0], "expected": 2 },
+    { "input": ["ABAA", 0], "expected": 2 },
+    { "input": ["ABBB", 2], "expected": 4 },
+    { "input": ["KRSCDCSONAJNHLBMDQGIFCPEKPOHQIHLTDIQGEKLRLCQNBOHNDQGHJPNDQPERNFSSSRDEQLFPCCCARFMDLHADJADAGNNSBNCJQOF", 4], "expected": 7 },
+    { "input_py": "['AB' * 50000, 25000]", "expected": 50001 }
+  ]
+}
