@@ -63,6 +63,20 @@ def load_problem(problem_dir):
     return meta, tests, checker_src
 
 
+def materialize_case(case):
+    """Support programmatic cases: 'input_py' / 'expected_py' hold Python
+    expressions (evaluated here, trusted repo content) so large stress tests
+    stay compact in tests.json."""
+    if "input_py" not in case and "expected_py" not in case:
+        return case
+    out = dict(case)
+    if "input_py" in out:
+        out["input"] = eval(out.pop("input_py"))  # noqa: S307 - our own files
+    if "expected_py" in out:
+        out["expected"] = eval(out.pop("expected_py"))  # noqa: S307
+    return out
+
+
 def judge_submission(problem_dir, user_code, include_hidden=True, custom_cases=None):
     """Judge a run (visible/custom cases) or submission (visible + hidden)."""
     meta, tests, checker_src = load_problem(problem_dir)
@@ -72,6 +86,7 @@ def judge_submission(problem_dir, user_code, include_hidden=True, custom_cases=N
         cases = list(tests.get("visible", []))
         if include_hidden:
             cases += tests.get("hidden", [])
+    cases = [materialize_case(c) for c in cases]
     result = run_cases(user_code, cases, meta["judge"], checker_src)
     if result["status"] == "ok":
         n_visible = len(tests.get("visible", [])) if custom_cases is None else len(cases)

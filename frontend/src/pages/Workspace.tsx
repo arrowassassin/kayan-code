@@ -145,7 +145,7 @@ export function Workspace({
                 <Badge key={t}>{t}</Badge>
               ))}
             </div>
-            <Markdown>{problem.statement}</Markdown>
+            <Markdown>{problem.statement.replace(/^#\s.*\n+/, '')}</Markdown>
           </TabsContent>
           {!mock && (
             <TabsContent value="editorial" className="overflow-auto p-5">

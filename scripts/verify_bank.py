@@ -83,8 +83,15 @@ def check_problem(slug, all_slugs):
     if len(hidden) < 4:
         errors.append(f"need >= 4 hidden tests, got {len(hidden)}")
     for i, c in enumerate(visible + hidden):
+        if "input_py" in c:
+            continue
         if "input" not in c or not isinstance(c["input"], list):
             errors.append(f"test {i}: 'input' must be a JSON array of arguments")
+            break
+    for i, c in enumerate(visible):
+        if "input_py" in c:
+            errors.append(f"visible test {i}: input_py is hidden-only "
+                          "(visible cases must be UI-editable JSON)")
             break
 
     starter = open(os.path.join(pdir, "starter.py")).read()
