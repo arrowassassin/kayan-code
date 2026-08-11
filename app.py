@@ -14,6 +14,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+import stubgen
 from judge import runner
 from reviewer import ai_review
 
@@ -193,6 +194,18 @@ def get_problem(slug: str):
         "hidden_count": len(tests.get("hidden", [])),
         "hints": hints,
     }
+
+
+@app.get("/api/problems/{slug}/starter")
+def get_starter(slug: str, language: str = "python"):
+    meta = get_problem_meta(slug)
+    source = _read(os.path.join(meta["dir"], "starter.py"))
+    if language.lower() in ("python", "python3", "py"):
+        return {"language": "python", "starter": source}
+    generated = stubgen.generate(source, language.lower())
+    if generated is None:
+        raise HTTPException(404, f"No starter template for language: {language}")
+    return {"language": language.lower(), "starter": generated}
 
 
 @app.get("/api/problems/{slug}/editorial")

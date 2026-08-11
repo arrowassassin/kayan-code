@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import type { CaseResult, JudgeResult } from '@/lib/api'
 import { cn, fmtMs } from '@/lib/utils'
+import { AIReviewButton } from '@/components/AIReview'
 
 const verdictLabel: Record<string, string> = {
   AC: 'Accepted',
@@ -70,6 +71,11 @@ export function ResultsPanel({ result }: { result: JudgeResult }) {
           <span className="text-[13px] text-ink-dim">
             {result.passed}/{result.total} cases · {fmtMs(result.runtime_ms)} total
           </span>
+          {result.submission_id != null && (
+            <span className="ml-auto">
+              <AIReviewButton submissionId={result.submission_id} />
+            </span>
+          )}
         </motion.div>
       )}
       <div className="mb-3 flex flex-wrap gap-1.5">

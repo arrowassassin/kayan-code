@@ -141,6 +141,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   problems: () => request<ProblemSummary[]>('/api/problems'),
   problem: (slug: string) => request<ProblemDetail>(`/api/problems/${slug}`),
+  starter: (slug: string, language: string) =>
+    request<{ language: string; starter: string }>(
+      `/api/problems/${slug}/starter?language=${language}`,
+    ),
   editorial: (slug: string) =>
     request<{ editorial: string }>(`/api/problems/${slug}/editorial`),
   run: (slug: string, code: string, cases?: TestCase[], language = 'python') =>
