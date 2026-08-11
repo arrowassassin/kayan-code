@@ -1,0 +1,12 @@
+{
+  "id": 5,
+  "title": "Longest Palindromic Substring",
+  "difficulty": "Medium",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "longestPalindrome",
+    "compare": "exact"
+  }
+}

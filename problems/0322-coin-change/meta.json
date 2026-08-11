@@ -1,0 +1,12 @@
+{
+  "id": 322,
+  "title": "Coin Change",
+  "difficulty": "Medium",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "coinChange",
+    "compare": "exact"
+  }
+}

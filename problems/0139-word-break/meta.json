@@ -1,0 +1,13 @@
+{
+  "id": 139,
+  "title": "Word Break",
+  "difficulty": "Medium",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "follow_up": "0091-decode-ways",
+  "judge": {
+    "mode": "function",
+    "entry": "wordBreak",
+    "compare": "exact"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": 72,
+  "title": "Edit Distance",
+  "difficulty": "Hard",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "minDistance",
+    "compare": "exact"
+  }
+}

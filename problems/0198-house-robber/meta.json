@@ -1,0 +1,13 @@
+{
+  "id": 198,
+  "title": "House Robber",
+  "difficulty": "Medium",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "follow_up": "1235-maximum-profit-in-job-scheduling",
+  "judge": {
+    "mode": "function",
+    "entry": "rob",
+    "compare": "exact"
+  }
+}

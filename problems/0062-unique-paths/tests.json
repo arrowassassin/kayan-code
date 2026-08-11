@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [3, 7], "expected": 28 },
+    { "input": [3, 2], "expected": 3 }
+  ],
+  "hidden": [
+    { "input": [1, 1], "expected": 1 },
+    { "input": [1, 100], "expected": 1 },
+    { "input": [100, 1], "expected": 1 },
+    { "input": [2, 2], "expected": 2 },
+    { "input": [7, 3], "expected": 28 },
+    { "input": [10, 10], "expected": 48620 },
+    { "input": [23, 12], "expected": 193536720 },
+    { "input_py": "[100, 100]", "expected_py": "__import__('math').comb(198, 99)" }
+  ]
+}

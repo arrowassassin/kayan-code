@@ -1,0 +1,18 @@
+{
+  "visible": [
+    { "input": [[1,2,3,1]], "expected": 4 },
+    { "input": [[2,7,9,3,1]], "expected": 12 }
+  ],
+  "hidden": [
+    { "input": [[5]], "expected": 5 },
+    { "input": [[0]], "expected": 0 },
+    { "input": [[2,1]], "expected": 2 },
+    { "input": [[1,2]], "expected": 2 },
+    { "input": [[0,0,0,0]], "expected": 0 },
+    { "input": [[400,1,400,1,400]], "expected": 1200 },
+    { "input": [[1,400,1,1,400,1]], "expected": 800 },
+    { "input": [[2,10,3,8,1,9,4]], "expected": 27 },
+    { "input_py": "[[400] * 100]", "expected": 20000 },
+    { "input_py": "[[1, 400] * 50]", "expected": 20000 }
+  ]
+}

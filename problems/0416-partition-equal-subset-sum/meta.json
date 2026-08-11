@@ -1,0 +1,12 @@
+{
+  "id": 416,
+  "title": "Partition Equal Subset Sum",
+  "difficulty": "Medium",
+  "topics": ["Dynamic Programming"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "canPartition",
+    "compare": "exact"
+  }
+}

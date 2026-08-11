@@ -1,0 +1,19 @@
+{
+  "visible": [
+    { "input": ["babad"], "expected": "bab" },
+    { "input": ["cbbd"], "expected": "bb" },
+    { "input": ["ac"], "expected": "a" }
+  ],
+  "hidden": [
+    { "input": ["a"], "expected": "a" },
+    { "input": ["aa"], "expected": "aa" },
+    { "input": ["abb"], "expected": "bb" },
+    { "input": ["abba"], "expected": "abba" },
+    { "input": ["aacabdkacaa"], "expected": "aca" },
+    { "input": ["forgeeksskeegfor"], "expected": "geeksskeeg" },
+    { "input": ["Aa9aA"], "expected": "Aa9aA" },
+    { "input": ["abcda"], "expected": "a" },
+    { "input_py": "['ab' * 500]", "expected_py": "'a' + 'ba' * 499" },
+    { "input_py": "['a' * 1000]", "expected_py": "'a' * 1000" }
+  ]
+}
