@@ -1,0 +1,9 @@
+.env
+db.sqlite
+db.sqlite-wal
+db.sqlite-shm
+__pycache__/
+*.pyc
+build-editor/node_modules/
+build-editor/package-lock.json
+.pytest_cache/

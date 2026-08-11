@@ -1,0 +1,7 @@
+{
+  "reviewer_models": [
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "openai/gpt-oss-20b:free"
+  ],
+  "reviewer_temperature": 0.2
+}

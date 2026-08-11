@@ -1,0 +1,13 @@
+{
+  "id": 146,
+  "title": "LRU Cache",
+  "difficulty": "Medium",
+  "topics": ["Stream / Design"],
+  "snowflake_priority": 2,
+  "follow_up": "0380-insert-delete-getrandom",
+  "judge": {
+    "mode": "methods",
+    "entry": "LRUCache",
+    "compare": "exact"
+  }
+}

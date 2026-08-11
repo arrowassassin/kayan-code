@@ -1,0 +1,13 @@
+{
+  "id": 200,
+  "title": "Number of Islands",
+  "difficulty": "Medium",
+  "topics": ["Graph BFS/DFS"],
+  "snowflake_priority": 2,
+  "follow_up": "0994-rotting-oranges",
+  "judge": {
+    "mode": "function",
+    "entry": "numIslands",
+    "compare": "exact"
+  }
+}
