@@ -1,0 +1,16 @@
+{
+  "visible": [
+    { "input": [[1, 2, 3, null, null, 4, 5]], "expected": [1, 2, 3, null, null, 4, 5] },
+    { "input": [[]], "expected": [] }
+  ],
+  "hidden": [
+    { "input": [[1]], "expected": [1] },
+    { "input": [[1, 2]], "expected": [1, 2] },
+    { "input": [[1, null, 2, null, 3]], "expected": [1, null, 2, null, 3] },
+    { "input": [[5, -3, 9, null, -7]], "expected": [5, -3, 9, null, -7] },
+    { "input": [[2, 2, 2, 2, null, null, 2]], "expected": [2, 2, 2, 2, null, null, 2] },
+    { "input": [[0, -1000, 1000]], "expected": [0, -1000, 1000] },
+    { "input_py": "[[0] + [x for i in range(1, 10000) for x in (None, i)]]",
+      "expected_py": "[0] + [x for i in range(1, 10000) for x in (None, i)]" }
+  ]
+}

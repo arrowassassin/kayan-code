@@ -1,0 +1,14 @@
+{
+  "id": 199,
+  "title": "Binary Tree Right Side View",
+  "difficulty": "Medium",
+  "topics": ["Trees"],
+  "snowflake_priority": 2,
+  "follow_up": "0987-vertical-order-traversal-of-a-binary-tree",
+  "judge": {
+    "mode": "function",
+    "entry": "rightSideView",
+    "compare": "exact",
+    "arg_types": ["tree"]
+  }
+}

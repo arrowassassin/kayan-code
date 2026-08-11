@@ -1,0 +1,13 @@
+{
+  "id": 98,
+  "title": "Validate Binary Search Tree",
+  "difficulty": "Medium",
+  "topics": ["Trees"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "isValidBST",
+    "compare": "exact",
+    "arg_types": ["tree"]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "id": 102,
+  "title": "Binary Tree Level Order Traversal",
+  "difficulty": "Medium",
+  "topics": ["Trees"],
+  "snowflake_priority": 2,
+  "follow_up": "0103-binary-tree-zigzag-level-order-traversal",
+  "judge": {
+    "mode": "function",
+    "entry": "levelOrder",
+    "compare": "exact",
+    "arg_types": ["tree"]
+  }
+}

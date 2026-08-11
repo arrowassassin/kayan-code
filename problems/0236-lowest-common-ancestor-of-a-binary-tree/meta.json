@@ -1,0 +1,13 @@
+{
+  "id": 236,
+  "title": "Lowest Common Ancestor of a Binary Tree",
+  "difficulty": "Medium",
+  "topics": ["Trees"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "lowestCommonAncestor",
+    "compare": "exact",
+    "arg_types": ["tree", "raw", "raw"]
+  }
+}

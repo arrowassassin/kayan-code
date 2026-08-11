@@ -1,0 +1,14 @@
+{
+  "id": 297,
+  "title": "Serialize and Deserialize Binary Tree",
+  "difficulty": "Hard",
+  "topics": ["Trees"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "roundtrip",
+    "compare": "exact",
+    "arg_types": ["tree"],
+    "ret_type": "tree"
+  }
+}
