@@ -13,6 +13,7 @@ import {
   UploadCloud,
 } from 'lucide-react'
 import { api, type JudgeResult, type TestCase } from '@/lib/api'
+import { LANGUAGES, langById, starterFor } from '@/lib/languages'
 import { cn, fmtMs, timeAgo } from '@/lib/utils'
 import { Badge, DifficultyBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -60,7 +61,12 @@ export function Workspace({
     queryKey: ['problem', slug],
     queryFn: () => api.problem(slug),
   })
-  const [code, setCode] = useSavedCode(slug, problem?.starter)
+  const [language, setLanguage] = useState('python')
+  const starter =
+    problem === undefined
+      ? undefined
+      : starterFor(langById(language), problem.starter)
+  const [code, setCode] = useSavedCode(`${slug}:${language}`, starter)
   const [uiMode, setUiMode] = useState<UiMode>(mock ? 'interview' : 'practice')
   const [bottomTab, setBottomTab] = useState<'tests' | 'result'>('tests')
   const [result, setResult] = useState<JudgeResult | null>(null)
@@ -76,7 +82,7 @@ export function Workspace({
   const effectiveCases = cases ?? problem?.visible_tests ?? []
 
   const runMut = useMutation({
-    mutationFn: () => api.run(slug, code, cases ?? undefined),
+    mutationFn: () => api.run(slug, code, cases ?? undefined, language),
     onSuccess: (r) => {
       setResult(r)
       setBottomTab('result')
@@ -85,7 +91,7 @@ export function Workspace({
   })
   const submitMut = useMutation({
     mutationFn: () =>
-      api.submit(slug, code, mock ? 'mock' : uiMode, mock?.sessionId),
+      api.submit(slug, code, mock ? 'mock' : uiMode, mock?.sessionId, language),
     onSuccess: (r) => {
       setResult(r)
       setBottomTab('result')
@@ -167,7 +173,23 @@ export function Workspace({
       <section className="flex min-h-0 flex-col gap-3">
         <div className="flex min-h-0 flex-[1.7] flex-col overflow-hidden rounded-xl border border-line bg-panel">
           <div className="flex shrink-0 items-center gap-2.5 border-b border-line px-3 py-2">
-            <span className="font-mono text-[12.5px] text-ink-faint">python3</span>
+            {mock ? (
+              <span className="font-mono text-[12.5px] text-ink-faint">python3</span>
+            ) : (
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="cursor-pointer rounded-lg border border-line bg-bg2 px-2 py-1 font-mono text-[12.5px] text-ink-dim outline-none transition-colors hover:border-accent focus:border-accent"
+                title="Non-Python solutions are AI-translated to Python before judging (needs OPENROUTER_API_KEY)"
+              >
+                {LANGUAGES.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.label}
+                    {l.id !== 'python' ? ' (AI→py)' : ''}
+                  </option>
+                ))}
+              </select>
+            )}
             {!mock && (
               <div className="flex overflow-hidden rounded-lg border border-line">
                 {(['practice', 'interview', 'whiteboard'] as const).map((m) => (
@@ -203,7 +225,7 @@ export function Workspace({
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  setCode(problem.starter)
+                  setCode(starter ?? problem.starter)
                   toast('Reset to starter code')
                 }}
               >
@@ -212,7 +234,12 @@ export function Workspace({
             </div>
           </div>
           <div className="min-h-0 flex-1 overflow-auto">
-            <CodeEditor value={code} onChange={setCode} mode={editorMode} />
+            <CodeEditor
+              value={code}
+              onChange={setCode}
+              mode={editorMode}
+              language={mock ? 'python' : language}
+            />
           </div>
         </div>
 
@@ -489,6 +516,9 @@ export function SubmissionsTab({
               {s.passed}/{s.total} · {fmtMs(s.runtime_ms)}
             </span>
             {s.mode !== 'practice' && <Badge>{s.mode}</Badge>}
+            {s.language && s.language !== 'python' && (
+              <Badge variant="outline">{s.language} → py</Badge>
+            )}
             <span className="ml-auto text-xs text-ink-faint">{timeAgo(s.created_at)}</span>
           </button>
           {openId === s.id && detail && (

@@ -78,6 +78,13 @@ def init_db():
             updated_at TEXT NOT NULL
         );
         """)
+        # additive migrations for multi-language submissions
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(submissions)")}
+        if "language" not in cols:
+            conn.execute("ALTER TABLE submissions ADD COLUMN language TEXT"
+                         " NOT NULL DEFAULT 'python'")
+        if "transpiled_code" not in cols:
+            conn.execute("ALTER TABLE submissions ADD COLUMN transpiled_code TEXT")
 
 
 init_db()
@@ -202,40 +209,69 @@ def get_editorial(slug: str):
 class RunRequest(BaseModel):
     slug: str
     code: str
+    language: str = "python"
     cases: list | None = None  # user-edited visible cases
 
 
 class SubmitRequest(BaseModel):
     slug: str
     code: str
+    language: str = "python"
     mode: str = "practice"          # practice | interview | whiteboard | mock
     mock_session_id: str | None = None
+
+
+def resolve_python_code(meta, code, language):
+    """Non-Python solutions are AI-transpiled to judge-ready Python.
+    Returns (python_code, transpiled_or_None)."""
+    if language.lower() in ("python", "python3", "py"):
+        return code, None
+    pdir = meta["dir"]
+    starter = _read(os.path.join(pdir, "starter.py"))
+    try:
+        python_code, _model = ai_review.transpile_to_python(
+            code, language, starter, meta["judge"]["entry"])
+    except ai_review.ReviewError as e:
+        raise HTTPException(502, str(e))
+    return python_code, python_code
 
 
 @app.post("/api/run")
 def run_code(req: RunRequest):
     meta = get_problem_meta(req.slug)
+    code, transpiled = resolve_python_code(meta, req.code, req.language)
     custom = req.cases if req.cases else None
-    result = runner.judge_submission(meta["dir"], req.code,
+    result = runner.judge_submission(meta["dir"], code,
                                      include_hidden=False, custom_cases=custom)
+    if transpiled:
+        result["transpiled_code"] = transpiled
     return result
 
 
 @app.post("/api/submit")
 def submit_code(req: SubmitRequest):
     meta = get_problem_meta(req.slug)
-    result = runner.judge_submission(meta["dir"], req.code, include_hidden=True)
+    if req.mock_session_id and req.language.lower() not in ("python", "python3", "py"):
+        raise HTTPException(409, "Mock sessions are Python-only — the real "
+                                 "round is Python, and mock mode enforces "
+                                 "real conditions (no AI translation).")
+    code, transpiled = resolve_python_code(meta, req.code, req.language)
+    result = runner.judge_submission(meta["dir"], code, include_hidden=True)
     if result["status"] != "ok":
+        if transpiled:
+            result["transpiled_code"] = transpiled
         return result
     with db() as conn:
         cur = conn.execute(
             "INSERT INTO submissions (slug, code, verdict, passed, total, runtime_ms,"
-            " mode, mock_session_id, result_json, created_at)"
-            " VALUES (?,?,?,?,?,?,?,?,?,?)",
+            " mode, mock_session_id, result_json, created_at, language, transpiled_code)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             (req.slug, req.code, result["verdict"], result["passed"], result["total"],
              result["runtime_ms"], req.mode, req.mock_session_id,
-             json.dumps(result), iso(now())))
+             json.dumps(result), iso(now()), req.language.lower(), transpiled))
         result["submission_id"] = cur.lastrowid
+    if transpiled:
+        result["transpiled_code"] = transpiled
     update_srs(req.slug, result["verdict"] == "AC")
     if req.mock_session_id and result["verdict"] == "AC":
         maybe_reveal_followup(req.mock_session_id, req.slug)
@@ -268,7 +304,7 @@ def update_srs(slug, passed):
 
 @app.get("/api/submissions")
 def list_submissions(slug: str | None = None, limit: int = 50):
-    q = ("SELECT id, slug, verdict, passed, total, runtime_ms, mode,"
+    q = ("SELECT id, slug, verdict, passed, total, runtime_ms, mode, language,"
          " mock_session_id, created_at FROM submissions")
     args = []
     if slug:

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import CodeMirror, { EditorView } from '@uiw/react-codemirror'
-import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
+import { langById } from '@/lib/languages'
 
 export type EditorMode = 'practice' | 'interview'
 
@@ -14,11 +14,13 @@ export function CodeEditor({
   value,
   onChange,
   mode,
+  language = 'python',
   readOnly = false,
 }: {
   value: string
   onChange: (v: string) => void
   mode: EditorMode
+  language?: string
   readOnly?: boolean
 }) {
   const basicSetup = useMemo(
@@ -61,7 +63,7 @@ export function CodeEditor({
         theme={oneDark}
         readOnly={readOnly}
         basicSetup={basicSetup}
-        extensions={[python(), EditorView.lineWrapping]}
+        extensions={[langById(language).extension(), EditorView.lineWrapping]}
       />
     </div>
   )

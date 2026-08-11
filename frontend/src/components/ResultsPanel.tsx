@@ -51,6 +51,7 @@ export function ResultsPanel({ result }: { result: JudgeResult }) {
   }
 
   const cases = result.cases ?? []
+  const transpiled = result.transpiled_code
   const firstFail = cases.findIndex((c) => c.verdict !== 'AC')
   const selIdx = Math.min(sel, cases.length - 1)
   const c: CaseResult | undefined = cases[selIdx]
@@ -88,6 +89,16 @@ export function ResultsPanel({ result }: { result: JudgeResult }) {
           </button>
         ))}
       </div>
+      {transpiled && (
+        <details className="mb-3 rounded-lg border border-line bg-bg2">
+          <summary className="cursor-pointer px-3 py-2 text-[13px] font-semibold text-accent2">
+            AI-translated Python (what the judge actually ran)
+          </summary>
+          <pre className="m-0 max-h-56 overflow-auto whitespace-pre-wrap border-t border-line px-3 py-2 font-mono text-[12.5px]">
+            {transpiled}
+          </pre>
+        </details>
+      )}
       {c && (
         <div>
           <div className="mb-2 text-[13px] text-ink-dim">

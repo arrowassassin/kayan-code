@@ -51,6 +51,7 @@ export interface JudgeResult {
   verdict?: Verdict
   runtime_ms?: number
   submission_id?: number
+  transpiled_code?: string
 }
 
 export interface SubmissionRow {
@@ -61,6 +62,7 @@ export interface SubmissionRow {
   total: number
   runtime_ms: number
   mode: string
+  language: string
   mock_session_id: string | null
   created_at: string
   has_review: boolean
@@ -141,15 +143,21 @@ export const api = {
   problem: (slug: string) => request<ProblemDetail>(`/api/problems/${slug}`),
   editorial: (slug: string) =>
     request<{ editorial: string }>(`/api/problems/${slug}/editorial`),
-  run: (slug: string, code: string, cases?: TestCase[]) =>
+  run: (slug: string, code: string, cases?: TestCase[], language = 'python') =>
     request<JudgeResult>('/api/run', {
       method: 'POST',
-      body: JSON.stringify({ slug, code, cases }),
+      body: JSON.stringify({ slug, code, cases, language }),
     }),
-  submit: (slug: string, code: string, mode = 'practice', mock_session_id?: string) =>
+  submit: (
+    slug: string,
+    code: string,
+    mode = 'practice',
+    mock_session_id?: string,
+    language = 'python',
+  ) =>
     request<JudgeResult>('/api/submit', {
       method: 'POST',
-      body: JSON.stringify({ slug, code, mode, mock_session_id }),
+      body: JSON.stringify({ slug, code, mode, mock_session_id, language }),
     }),
   submissions: (slug?: string) =>
     request<SubmissionRow[]>(`/api/submissions${slug ? `?slug=${slug}` : ''}`),
