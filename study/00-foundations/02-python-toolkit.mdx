@@ -104,6 +104,16 @@ occurrences. Since 3.10 both take `key=`. Remember `insort` is O(n) per call
 (finding the spot is log n, *inserting* shifts the array) — fine occasionally,
 wrong inside a hot loop.
 
+The senior answer when the shift hurts: **`sortedcontainers.SortedList`** —
+third-party but pre-installed on LeetCode — gives O(log n) adds and removes
+*plus* ordered queries (`bisect_left`, `irange`, indexing). The spoken line:
+"Python's stdlib has no balanced-BST container; I'd use `SortedList` here —
+in Java I'd reach for `TreeMap`, in C++ `std::map`." It unlocks a whole
+question family — calendar booking (insert an interval, check ordered
+neighbors), Range Module, time-based key-value stores — anywhere you need
+"keep it sorted *and* keep inserting". If the interviewer bans it, say you'd
+hand-roll with `bisect` and accept the O(n) insert, or sketch a BST.
+
 ## `itertools`: the five worth knowing
 
 - `permutations(xs, r)` / `combinations(xs, r)` — when brute force is intended (n ≤ ~10)

@@ -57,6 +57,27 @@ add cost" fails, and the whole argument — and the algorithm — breaks. That
 paragraph, out loud, is exactly the level of justification a senior loop
 wants.
 
+```mermaid
+graph LR
+    S["src · 0"] --> A["a · 2"]
+    S --> B["b · 5"]
+    A --> U["u · 4 ← pop next"]
+    B --> W["w · 6"]
+    W -. "≥ 6 + rest" .-> U
+    A --> X["x · ?"]
+    style S fill:#1f3d2e,stroke:#2ecc8f
+    style A fill:#1f3d2e,stroke:#2ecc8f
+    style B fill:#1f3d2e,stroke:#2ecc8f
+    style U fill:#3d3420,stroke:#f5b942
+    style W fill:#3d3420,stroke:#f5b942
+    style X fill:#3d2022,stroke:#f4595e
+```
+
+Green = settled (distance final), amber = the frontier heap, red = untouched.
+`u` at 4 is the frontier minimum, so any rival route through `w` starts at
+≥ 6 and non-negative edges can only add — 4 is final. That picture *is* the
+proof.
+
 The idiomatic Python version uses **lazy deletion**: `heapq` can't decrease
 a key that's already in the heap, so we push duplicates and discard stale
 ones when popped.

@@ -59,6 +59,41 @@ senior signal. It shows you design against the constraints, not by habit.
 4. **Different inputs get different letters.** Comparing every word (n) against
    every character of a pattern (m) is O(n·m), never "O(n²)".
 
+## Stating the cost of recursion
+
+Recursion scares people into hand-waving. Don't hand-wave; multiply:
+
+> **cost ≈ (number of nodes in the call tree) × (work per node)** — or,
+> when every level does the same total work, **depth × work per level**.
+
+Merge sort: the call tree is log n levels deep, and each level touches all n
+elements once during merging → O(n log n). Naive Fibonacci: each call spawns
+two more, so the tree has ~2ⁿ nodes doing O(1) each → O(2ⁿ). A recursion
+that halves the input and recurses *once* (binary search) is just the depth:
+O(log n).
+
+The caveat interviewers fish for: **depth depends on shape**. "Depth is
+log n" is only true when the split is balanced. Quicksort with bad pivots and
+BST insertion into sorted input both degrade to depth n — the same code, a
+different tree, a different bound. The honest sentence: "O(n log n) expected,
+O(n²) if every split is lopsided." Saying both halves is the senior version.
+
+## Logarithms: what you're allowed to ignore
+
+Two facts make logs friendly in interviews:
+
+1. **The base doesn't matter inside O.** log₂ n and log₁₀ n differ by a
+   constant factor (log₂ n = log₁₀ n / log₁₀ 2 ≈ 3.3 × log₁₀ n), and Big-O
+   drops constants — so just say "log n" and never specify a base.
+2. **log n is almost a constant in practice.** log₂ of a million is ~20; of
+   a billion, ~30. When you see O(n log n), think "n times a small number".
+   That's why sorting something first is so often free: the sort's
+   O(n log n) rarely dominates whatever you do next.
+
+One more spoken identity: **"halving until 1 takes log n steps"** — that
+single sentence justifies binary search, heap height, and balanced-tree
+depth all at once.
+
 ## Space complexity
 
 Same idea, for memory. Count what you *allocate*, not what you were given:
@@ -82,6 +117,21 @@ The word to say out loud: "worst case for one call, but amortized constant."
 - `sorted(xs)`: O(n log n), Timsort, stable
 - `heapq.heappush/pop`: O(log n); `heapify`: O(n)
 - String concatenation in a loop: O(n²) — build a list, `''.join` at the end
+
+## Answering "can you do better?"
+
+This question is a ritual, and it has a ritual answer. First, check the
+**floor**: if you must read all n inputs to be correct, O(n) is the floor and
+you can say so — "any algorithm has to look at every element, so linear is
+optimal here." (Sorted input is the exception; that's what lets binary search
+skip reading.) Comparison sorting has a known floor of O(n log n) — name it
+rather than chase below it. Second, if you're above the floor, name the gap
+and the tool: quadratic → "the inner loop re-derives work; a hash map /
+sorted structure / two pointers should remove it." Third, if you genuinely
+believe you're optimal, say the floor argument out loud instead of
+squirming. "I don't think we can — we have to touch every element" is a
+strong answer; silence is not. And sometimes the intended better is **space**,
+not time — if time looks tight already, ask "better in time, or in space?"
 
 ## The one-line spoken justification
 

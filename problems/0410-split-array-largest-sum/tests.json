@@ -2,7 +2,7 @@
   "visible": [
     { "input": [[7,2,5,10,8], 2], "expected": 18 },
     { "input": [[1,2,3,4,5], 2], "expected": 9 },
-    { "input": [[10,2,3,10], 2], "expected": 15 }
+    { "input": [[10,2,3,10], 2], "expected": 13 }
   ],
   "hidden": [
     { "input": [[10], 1], "expected": 10 },

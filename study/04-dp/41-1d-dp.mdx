@@ -32,6 +32,22 @@ neighbors. `f(i) = max(f(i-1), nums[i] + f(i-2))`. Variants dress it up
 is identical. When you see "adjacent items conflict, maximize value", think
 take/skip.
 
+Watch the table march left→right on `nums = [2, 7, 9, 3, 1]` — each cell is
+`max(skip = prev cell, take = house + cell two back)`:
+
+```mermaid
+graph LR
+    A["house 2<br/>dp = 2"] --> B["house 7<br/>dp = 7<br/>take 7 > skip 2"]
+    B --> C["house 9<br/>dp = 11<br/>take 9+2 > skip 7"]
+    C --> D["house 3<br/>dp = 11<br/>skip 11 > take 3+7"]
+    D --> E["house 1<br/>dp = 12<br/>take 1+11 > skip 11"]
+    style C fill:#1f3d2e,stroke:#2ecc8f
+    style E fill:#1f3d2e,stroke:#2ecc8f
+```
+
+Only the last two cells ever matter, which is why the table rolls down to two
+variables — O(1) space, the same march.
+
 ## Min-cost to reach: Coin Change and the −1 convention
 
 [Coin Change](/problems/0322-coin-change): fewest coins summing to `amount`.

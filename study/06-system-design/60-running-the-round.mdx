@@ -30,6 +30,7 @@ shaved off both ends. Budget roughly:
 | 3. API sketch | 3–5 | The 3–5 endpoints/RPCs with request/response shapes |
 | 4. High-level diagram | 8–10 | Boxes and arrows covering the whole flow, no deep detail yet |
 | 5. Deep dives + trade-offs | 15–20 | 2–3 components explored to real depth, driven by interviewer interest |
+| 6. Wrap-up | 2–3 | The design summarized, key trade-offs restated, weaknesses named — then silence |
 
 ```mermaid
 flowchart LR
@@ -158,6 +159,31 @@ Other habits that read as senior: bringing up failure modes unprompted
 ("what happens when the cache dies?"), mentioning how you'd *know* the
 system is healthy (metrics, alerts), and changing your design when the
 interviewer adds a constraint instead of defending the old one.
+
+## Phase 6: Wrap-up (last 2–3 minutes)
+
+Most candidates let the round just… stop, mid-deep-dive, when the
+interviewer glances at the clock. Land it instead. With two or three
+minutes left, close the loop deliberately:
+
+1. **Summarize the design in three sentences** — the shape, the storage
+   choices, the one clever part. This is what the interviewer will
+   transcribe into the feedback; hand it to them pre-written.
+2. **Restate the two key trade-offs you chose** and why, in the same
+   numbers-first form you used when you made them.
+3. **Name the known weaknesses and what you'd do next** with more time.
+   Volunteering your design's flaws is a senior signal, not a confession —
+   it proves you see them.
+4. **Stop talking.** A wrap-up that trails into a fourth restatement undoes
+   the crispness of the first. Say it once, then hand the room back.
+
+The whole thing in one breath: *"So: read-optimized timeline with fan-out
+on write, Postgres for the social graph, Cassandra for the timeline cache.
+The two big calls were fan-out-on-write because we're 50:1 read-heavy, and
+eventual consistency on the feed because staleness is harmless here. The
+known weak spot is the celebrity path — I sketched the hybrid fix but I'd
+want to load-test the threshold. With more time I'd cover multi-region."*
+Fifteen seconds, and it's the paragraph the feedback gets written from.
 
 ## L5 vs L6, honestly
 

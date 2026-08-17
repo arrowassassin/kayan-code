@@ -24,10 +24,10 @@ Output: 9
 
 ```
 Input: nums = [10,2,3,10], k = 2
-Output: 15
+Output: 13
 ```
 
-`[10,2,3] | [10]`. The two 10s cannot be balanced into separate middle blocks because subarrays must be contiguous.
+`[10,2] | [3,10]` with block sums `12` and `13`. Cutting anywhere else leaves a block of 15 or more.
 
 ## Constraints
 

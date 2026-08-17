@@ -49,6 +49,24 @@ class DSU:
         return True
 ```
 
+```mermaid
+graph TD
+    subgraph before["before find(3)"]
+        R0["0 root"] --- N1["1"] --- N2["2"] --- N3["3"]
+    end
+    subgraph after["after find(3) — compressed"]
+        R0b["0 root"] --- N1b["1"]
+        R0b --- N2b["2"]
+        R0b --- N3b["3"]
+    end
+    style R0 fill:#1f3d2e,stroke:#2ecc8f
+    style R0b fill:#1f3d2e,stroke:#2ecc8f
+```
+
+That flattening is why the amortized bound holds: every `find` pays once to
+shorten the chain, and every later query through those nodes rides the
+shortcut.
+
 Where it beats DFS: **edges arriving as a stream**. Counting components
 ([Number of Connected Components](/problems/0323-number-of-connected-components-in-an-undirected-graph))
 is just `union` every edge and read `count`. Validating a tree

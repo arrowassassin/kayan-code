@@ -124,12 +124,33 @@ when:
 - **Few strings.** Sorting a small list and binary-searching (`bisect`) over
   prefixes is often less code for the same effect.
 - **Suffix or substring queries.** A prefix trie can't help with "contains" —
-  that's suffix-automaton/suffix-array land; just say the names.
+  that's the string-matching shelf below.
 - **Memory-constrained.** Per-node dicts are heavy; if pressed, mention
   compressed tries (radix trees) collapse single-child chains.
 
 The honest heuristic: *a trie is justified exactly when the word "prefix"
 appears in the requirements — or when many string searches can share work.*
+
+## The string-matching shelf: know they exist
+
+**Rolling hash / Rabin-Karp**: treat a length-L window of the string as a
+number in some base, so sliding the window one step updates the hash in O(1)
+(drop the outgoing character's term, shift, add the incoming one) instead of
+rehashing L characters. Equal hashes *might* be collisions, so you re-check
+candidate matches character-by-character — expected O(n + m) substring
+search. Its real interview payoff is powering binary-search-on-answer:
+"is there a duplicate substring of length L?" becomes hash-every-window +
+set lookup, which is how **Longest Duplicate Substring (LC 1044)** falls.
+
+**KMP**, at awareness level: precompute the **failure function** — for each
+prefix of the pattern, the length of its longest proper prefix that is also a
+suffix — so on a mismatch you slide the pattern by exactly the right amount
+instead of restarting. Say the name, know the O(n + m) claim, and admit you'd
+need a minute to rederive the table; that's the right calibration.
+
+Honest calibration: both are rare at Google — most string questions fall to
+hashing, two pointers, or a plain trie. If you give this shelf any time at
+all, give rolling hash the ten minutes; it's the one that shows up.
 
 ## Traps
 

@@ -1,0 +1,12 @@
+{
+  "id": 208,
+  "title": "Implement Trie (Prefix Tree)",
+  "difficulty": "Medium",
+  "topics": ["Tries"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "methods",
+    "entry": "Trie",
+    "compare": "exact"
+  }
+}

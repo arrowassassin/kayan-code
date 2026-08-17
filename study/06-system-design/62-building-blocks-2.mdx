@@ -39,6 +39,71 @@ NewSQL systems (Spanner, CockroachDB) offer SQL + transactions *and*
 horizontal scale, at the cost of extra write latency (cross-replica
 coordination) — fine to name, don't lean on it as a magic wand.
 
+## Data modeling: designing the schema in the round
+
+Picking the database is half the decision; the other half — the one
+interviewers actually probe — is what the tables look like. The freshman
+version is "one table per noun": users, posts, follows. That part is easy.
+The senior move is choosing the **keys from the access patterns**, because
+the primary key (and in a partitioned store, the partition key) decides
+which queries are one cheap lookup and which are a scatter-gather across
+the cluster. Write the hot queries down first; the schema falls out of them.
+
+**Composite keys** are the everyday tool. In a chat system, messages keyed
+by a random `message_id` scatter one conversation across shards; keyed
+`(conversation_id, seq)` they cluster — the partition key routes to one
+shard, and the sort component makes "latest 50 messages" a single
+sequential range read. Same data, opposite performance, purely a key
+choice.
+
+**Worked mini-example — the follow graph and timeline:**
+
+```mermaid
+erDiagram
+    USERS ||--o{ FOLLOWS : "follower"
+    USERS ||--o{ POSTS : "author"
+    USERS {
+        id user_id PK
+        int follower_count "denormalized"
+    }
+    FOLLOWS {
+        id follower_id PK
+        id followee_id PK
+    }
+    POSTS {
+        id post_id PK
+        id author_id FK
+        ts created_at
+    }
+```
+
+`follows(follower_id, followee_id)` with the pair as primary key — but the
+two hot queries run in *opposite directions*: "who do I follow?" (build my
+timeline) keys on `follower_id`; "who follows me?" (fan out my new post)
+keys on `followee_id`. So you index both directions — a second index on
+`(followee_id, follower_id)`, or in a NoSQL store, literally a second table
+with the columns swapped. `posts(post_id, author_id, created_at, text)`
+gets an index on `(author_id, created_at)` because the hot read is "recent
+posts by this author."
+
+And `follower_count` lives **denormalized** on the user row. The
+normalized truth is `COUNT(*)` over follows — correct, and ruinous to
+recompute on every profile view for an account with 50M followers. So you
+store the count and increment it on follow/unfollow. The cost, stated
+honestly: two writes that can disagree (crash between them), so the count
+can drift and you reconcile with a periodic recount. That *is* the
+normalization trade at scale in one line: normalized data has one home and
+is always right but can be slow to assemble; denormalized data is
+pre-assembled for the read, and every write now pays to maintain the copies
+— **reads pay for writes**, or the reverse. Read-heavy systems (most of
+them) happily take that trade, deliberately.
+
+The sentence that scores, said while pointing at the schema: **"I'd model
+it as posts and a follows edge table, partitioned by user_id, because the
+hot query is 'recent posts for the people this user follows' — and I want
+that to stay single-shard per author."** Entities → keys → partition →
+justified by the hot query. That chain, spoken plainly, is the whole skill.
+
 ## Indexing: the B-tree in freshman terms
 
 Without an index, finding one row is reading the whole phone book — O(n)

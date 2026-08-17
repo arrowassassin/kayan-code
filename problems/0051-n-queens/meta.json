@@ -1,0 +1,12 @@
+{
+  "id": 51,
+  "title": "N-Queens",
+  "difficulty": "Hard",
+  "topics": ["Backtracking"],
+  "snowflake_priority": 3,
+  "judge": {
+    "mode": "function",
+    "entry": "solveNQueens",
+    "compare": "unordered"
+  }
+}

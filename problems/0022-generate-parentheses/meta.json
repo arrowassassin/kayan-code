@@ -1,0 +1,12 @@
+{
+  "id": 22,
+  "title": "Generate Parentheses",
+  "difficulty": "Medium",
+  "topics": ["Backtracking"],
+  "snowflake_priority": 2,
+  "judge": {
+    "mode": "function",
+    "entry": "generateParenthesis",
+    "compare": "unordered"
+  }
+}
