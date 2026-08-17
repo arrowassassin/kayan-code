@@ -1,0 +1,19 @@
+{
+  "visible": [
+    { "input": [[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], "ABCCED"], "expected": true },
+    { "input": [[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], "ABCB"], "expected": false }
+  ],
+  "hidden": [
+    { "input": [[["A"]], "A"], "expected": true },
+    { "input": [[["A"]], "B"], "expected": false },
+    { "input": [[["a","A"]], "Aa"], "expected": true },
+    { "input": [[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], "SEE"], "expected": true },
+    { "input": [[["C","A","A"],["A","A","A"],["B","C","D"]], "AAB"], "expected": true },
+    { "input": [[["A","B"],["C","D"]], "ABDCA"], "expected": false },
+    { "input": [[["A","B","C","D","E","F"]], "ABCDEF"], "expected": true },
+    { "input": [[["A"],["B"],["C"],["D"]], "DCBA"], "expected": true },
+    { "input": [[["A","A"],["A","A"]], "AAAAA"], "expected": false },
+    { "input_py": "[[['A']*6 for _ in range(6)], 'AAAAAAAAAAAB']", "expected": false },
+    { "input_py": "[[['A']*6 for _ in range(6)], 'AAAAAAAAAAAA']", "expected": true }
+  ]
+}

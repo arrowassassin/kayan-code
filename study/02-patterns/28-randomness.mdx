@@ -1,0 +1,165 @@
+---
+title: Randomized algorithms
+section: 2 · Algorithm Patterns
+order: 28
+minutes: 18
+---
+
+# Randomized algorithms
+
+A raffle where one person bought 70 of the 100 tickets should hand them the
+prize 70% of the time. Interview randomness questions are all this shape:
+**make the computer draw fairly from a distribution you've been handed** —
+weighted picks, uniform picks from a stream you can't store, uniform
+shuffles. The algorithms are short; the whole game is *proving* the
+distribution is right, because "looks random" is exactly the kind of claim a
+senior loop makes you defend.
+
+## Weighted random pick: prefix sums meet binary search
+
+**Random Pick with Weight (LC 528)** — a top-reported Google question:
+given weights `[1, 3, 2]`, return index 0 with probability 1/6, index 1 with
+3/6, index 2 with 2/6.
+
+The raffle-ticket picture *is* the derivation. Lay the tickets in a line:
+index 0 owns ticket 1, index 1 owns tickets 2–4, index 2 owns tickets 5–6.
+Now "pick a weighted index" has become "pick a **uniform** ticket number,
+then find whose range it landed in." And the ranges' right endpoints are
+exactly the **prefix sums** `[1, 4, 6]` — a sorted array. Finding "first
+prefix ≥ my ticket" in a sorted array is
+[binary search](/study/02-patterns/22-binary-search). That's the whole
+insight: **the cumulative-weight array turns one random draw into a
+`bisect` call.**
+
+```python
+import bisect, random
+from itertools import accumulate
+
+class Solution:
+    def __init__(self, w):
+        self.prefix = list(accumulate(w))     # [1, 4, 6]
+        self.total = self.prefix[-1]
+
+    def pickIndex(self):
+        ticket = random.randint(1, self.total)          # uniform ticket
+        return bisect.bisect_left(self.prefix, ticket)  # whose range?
+```
+
+O(n) build, O(log n) per pick, O(n) space. Why `bisect_left` and
+`randint(1, total)` (not 0): ticket t belongs to the first index whose
+prefix is ≥ t; drawing 0 would make the boundaries ambiguous. Off-by-ones
+here are the trap — fix the ticket range first, then the bisect side
+follows. Equivalently, `random.random() * total` with `bisect_right` works;
+pick one convention and defend it.
+
+Python trivia worth one sentence: `random.choices(range(n), weights=w)`
+does all of this internally (cumulative weights + bisect). Name it to show
+you know the library, then implement it anyway — implementing it is the
+question.
+
+## Reservoir sampling: uniform from a stream
+
+Now the input is a stream — a linked list, lines of a giant file — you may
+walk it **once** and can't store it. Return a uniformly random element.
+
+The k = 1 algorithm is three lines: keep one "champion"; when the i-th
+element arrives (1-indexed), replace the champion with it with probability
+1/i.
+
+```python
+import random
+
+def sample(stream):
+    champ = None
+    for i, x in enumerate(stream, 1):
+        if random.randrange(i) == 0:   # probability 1/i
+            champ = x
+    return champ
+```
+
+The proof, gently, for element j out of n total: it must **win** at step j
+(probability 1/j), then **survive** every later challenger — not be replaced
+at step j+1 (probability j/(j+1)), nor at j+2 ((j+1)/(j+2)), and so on:
+
+> P(j survives) = 1/j · j/(j+1) · (j+1)/(j+2) · … · (n−1)/n = 1/n
+
+Every numerator cancels the previous denominator — a telescoping product —
+leaving 1/n for *every* j, which is the definition of uniform. Walk this out
+loud; it's ninety seconds and it's the entire question.
+
+General k, stated: keep the first k elements as the reservoir; the i-th
+element (i > k) enters with probability k/i, evicting a uniformly random
+current member. Same telescoping argument, each element ends up kept with
+probability k/n. O(n) time, O(k) space, one pass.
+
+This is **Linked List Random Node (LC 382)** verbatim, and **Random Pick
+Index (LC 398)** — "random index of a given target value" — is reservoir
+over just the matching positions (or a value→indices dict if memory is
+allowed; offering both, with the memory/time trade, is the senior move).
+
+## Fisher-Yates: the only correct shuffle
+
+**Shuffle an Array (LC 384).** The correct algorithm walks the array once,
+swapping position i with a uniformly random position from **i onward**:
+
+```python
+def shuffle(a):
+    a = a[:]
+    for i in range(len(a)):
+        j = random.randrange(i, len(a))   # j ∈ [i, n) — includes i itself!
+        a[i], a[j] = a[j], a[i]
+    return a
+```
+
+Why it's uniform: position 0 receives each element with probability 1/n;
+given that, position 1 receives each survivor with probability 1/(n−1); and
+so on — n · (n−1) · … · 1 equally likely outcomes, exactly the n!
+permutations, each once. O(n) time, O(1) extra space beyond the copy.
+
+The naive version — swap `a[i]` with `random.randrange(n)`, any position —
+is **biased**, and the counting argument is the answer to say: the loop makes
+n independent n-way choices, nⁿ equally likely paths, but there are n!
+permutations, and n! does not divide nⁿ (for n = 3: 27 paths into 6
+permutations — can't be even). Some permutations must come up more often.
+Wrong-looking-right is why this question exists.
+
+`random.shuffle` *is* Fisher-Yates — say so, then write it by hand.
+
+## Traps
+
+- **Off-by-one in the ticket range** — `randint(1, total)` + `bisect_left`,
+  or `randrange(total)` + `bisect_right`; mixing conventions returns index 0
+  too often or never.
+- **`randrange(i, n)` must include i** — excluding "swap with self" is the
+  same bias as the naive shuffle, just mirrored.
+- **Testing randomness by eyeball** — the defensible check is a frequency
+  histogram over many trials, or better, the proof itself.
+- **Reaching for reservoir when you can store the input** — if it fits in
+  memory, a dict or one `randrange` is simpler; reservoir is for the
+  can't-store-it constraint, and saying *when* it applies is part of knowing
+  it.
+
+## What the interviewer asks next
+
+"Prove it's uniform" — telescoping product or the counting argument, from
+memory. "Many picks, few updates?" — precompute prefix sums once, O(log n)
+per pick (LC 528's actual design point). "Stream too big for k?" — that's
+what reservoir is; state the k/i rule. "What does `random.choices` do?" —
+cumulative weights + bisect, same as yours.
+
+## Practice ladder
+
+The bank has no dedicated randomness problems, so the drills are on LeetCode
+directly:
+
+1. LC 528 (Random Pick with Weight) — derive prefix-sums-into-bisect from
+   the ticket picture; the most-reported Google randomness question.
+2. LC 382 (Linked List Random Node) — reservoir k = 1 with the telescoping
+   proof spoken aloud.
+3. LC 398 (Random Pick Index) — reservoir over matching indices; offer the
+   dict alternative and the trade.
+4. LC 384 (Shuffle an Array) — Fisher-Yates plus the nⁿ vs n! bias
+   argument for the naive version.
+5. [Insert Delete GetRandom](/problems/0380-insert-delete-getrandom) — the
+   in-bank neighbor: `getRandom` in O(1) via the array+dict swap-delete
+   trick; randomness meets data-structure design.
