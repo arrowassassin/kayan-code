@@ -155,7 +155,7 @@ for you.
 
 ## Grid backtracking: Word Search
 
-The same template walks a 2-D grid. Word Search (LC 79 — not in the bank, do
+The same template walks a 2-D grid. [Word Search](/problems/0079-word-search) (do
 it on LeetCode) marks the current cell visited, tries four neighbors, and
 unmarks on the way out:
 
@@ -202,13 +202,16 @@ subsets/permutations don't repeat state, Word Break does).
 The bank is thin on pure backtracking, so this ladder mixes bank problems
 with LeetCode drills to do directly:
 
-1. LC 78 (Subsets) and LC 46 (Permutations) — on LeetCode itself; code both
+1. [Subsets](/problems/0078-subsets) and LC 46 (Permutations, external) — code both
    from memory until choose/explore/unchoose is muscle.
-2. LC 39 (Combination Sum) — the start-index + sort-and-break combo.
+2. [Combination Sum](/problems/0039-combination-sum) — the start-index +
+   sort-and-break combo. Then [Generate Parentheses](/problems/0022-generate-parentheses)
+   for the invariant-pruned variant.
 3. [Word Break](/problems/0139-word-break) — start it as backtracking, feel
    the TLE coming, add memoization; the DP bridge in one sitting.
-4. LC 79 (Word Search) — grid backtracking with in-place marking.
+4. [Word Search](/problems/0079-word-search) — grid backtracking with
+   in-place marking (the hidden suite punishes a missing un-mark).
 5. [Path Sum III](/problems/0437-path-sum-iii) — the choose/unchoose
    discipline applied to a running hashmap on a tree.
-6. LC 51 (N-Queens) — the capstone: constraint sets, pruning, and clean
+6. [N-Queens](/problems/0051-n-queens) — the capstone: constraint sets, pruning, and clean
    output construction under pressure.
