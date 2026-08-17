@@ -93,6 +93,16 @@ quantities. Recognizing that shape is the transferable skill.
 **Running mean.** [Moving Average](/problems/0346-moving-average-from-data-stream)
 is a prefix sum you keep only the tail of — a running total plus a queue.
 
+**Difference arrays — prefix's inverse.** To apply many range *updates*
+("add v to every index in [i, j]") and read the final array once, don't loop
+over ranges: record `D[i] += v` and `D[j+1] -= v`, then one prefix-sum pass
+over `D` materializes all updates. Each update is O(1), total O(n + q) —
+and the sweep-line +1/−1 trick from
+[Meeting Rooms II](/problems/0253-meeting-rooms-ii) is exactly this idea with
+timestamps as indices. Prefix turns totals into ranges; difference turns
+range edits into totals — knowing both directions is the mark of actually
+owning the pattern.
+
 ## Traps
 
 - **Off-by-one on the sentinel.** `P` has length n+1; `nums[i..j]` is

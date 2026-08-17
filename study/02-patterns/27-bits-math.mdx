@@ -1,0 +1,159 @@
+---
+title: Bits and interview math
+section: 2 · Algorithm Patterns
+order: 27
+minutes: 18
+---
+
+# Bits and interview math
+
+A row of 32 light switches can encode any subset of 32 things: switch i up
+means "item i is in". Flip switches, compare panels, count how many are up —
+that's all bit manipulation is: **treating an integer as a panel of on/off
+switches**, with operations that touch all 32 (or 64) switches in one CPU
+instruction. The payoff is O(1)-per-set operations and states small enough to
+be dict keys.
+
+## The toolkit
+
+| Op | Meaning | Panel picture |
+|---|---|---|
+| `a & b` | AND | switches up on *both* panels |
+| `a \| b` | OR | up on *either* |
+| `a ^ b` | XOR | up on *exactly one* — a difference detector |
+| `~a` | NOT | flip everything (Python: `~a == -a - 1`, infinite sign bits) |
+| `a << k` | shift left | multiply by 2ᵏ |
+| `a >> k` | shift right | floor-divide by 2ᵏ |
+
+The idioms built from them — each with its one-line why:
+
+- **`n & (n - 1)`** — clears the lowest set bit. Subtracting 1 flips the
+  lowest 1 and everything under it; AND wipes them. Uses: count set bits in
+  O(popcount) steps; `n & (n-1) == 0` tests power-of-two (with `n > 0`).
+- **`n & (-n)`** — isolates the lowest set bit (two's complement mirror of
+  the above; the Fenwick-tree step).
+- **XOR cancellation** — `x ^ x = 0`, `x ^ 0 = x`, order doesn't matter. So
+  XOR of a whole array cancels everything appearing twice: the classic
+  "every element appears twice except one — find it in O(n)/O(1)" is
+  `reduce(xor, nums)`. Also: swap without a temp, find the missing number by
+  XOR-ing indices against values.
+- **Masks as subsets** — subset S of n items is the integer with bit i set
+  for each i in S. Membership: `mask >> i & 1`. Add: `mask | (1 << i)`.
+  Remove: `mask & ~(1 << i)`. Toggle: `mask ^ (1 << i)`. Full set:
+  `(1 << n) - 1`. This is how "visited set of ≤ 20 items" becomes a plain
+  int — hashable, copyable for free, a perfect DP key.
+- **Enumerate all subsets** — `for mask in range(1 << n)` — the bitmask
+  brute force that constraints n ≤ 20 are inviting (2²⁰ ≈ 10⁶, fits the
+  [budget](/study/00-foundations/01-big-o)). To iterate the subsets *of a
+  given mask* (bitmask-over-subsets, the inner loop of subset-DP):
+
+```python
+sub = mask
+while sub:
+    use(sub)
+    sub = (sub - 1) & mask   # next-smaller subset of mask; visits all of them
+```
+
+Total work over all masks is O(3ⁿ) — each item is in mask-only / sub / out —
+a fact worth stating when you use it.
+
+## Interview math: the short list
+
+### Combinatorics you actually need
+
+`C(n, k) = n! / (k!(n-k)!)` counts ways to choose k of n when order doesn't
+matter; permutations `n!/(n-k)!` when it does. The one that shows up in
+disguise: a grid walk. [Unique Paths](/problems/0062-unique-paths) — from
+(0,0) to (m−1,n−1) moving only right/down — is choosing *which* of the
+m+n−2 steps are the m−1 downs:
+
+```python
+from math import comb
+def unique_paths(m, n):
+    return comb(m + n - 2, m - 1)
+```
+
+Closed form, O(min(m,n)) under the hood, no DP table. Presenting the DP
+*and* mentioning the closed form is the senior flourish — it shows you saw
+the structure, not just the recurrence. `math.comb` is exact (Python big
+ints); elsewhere you'd compute it multiplicatively or under a modulus.
+
+### Modular arithmetic
+
+When answers are "mod 10⁹+7", reduce as you go — `(a + b) % M`,
+`(a * b) % M` are safe at every step because mod distributes over + and ×.
+Division does *not* distribute; you'd need modular inverses
+(`pow(b, M - 2, M)` by Fermat, M prime) — know the phrase, derive on demand.
+Python's three-argument `pow(base, exp, mod)` is fast modular
+exponentiation; say it exists.
+
+### gcd
+
+`math.gcd` is Euclid's algorithm — `gcd(a, b) = gcd(b, a % b)` — O(log)
+time. Uses: reducing fractions to canonical form (slopes as
+`(dy//g, dx//g)` tuples for hashing collinear points), lcm via
+`a // g * b` (divide first — habit from overflow-land), step sizes in
+cyclic rotations.
+
+### Integer overflow: a non-issue in Python — say so anyway
+
+Python ints are arbitrary precision: `(lo + hi) // 2` cannot overflow,
+factorials just get big. But **say it out loud**: "in Java or C++ I'd write
+`lo + (hi - lo) / 2` and watch 32-bit multiplication — Python's big ints
+make this a non-issue." One sentence, free cross-language credibility. The
+flip side: big-int arithmetic isn't O(1) once numbers exceed machine words —
+multiplying two n-digit numbers costs more than a flop, which matters if you
+claim O(1) per operation on 10,000-digit values.
+
+### The negative division trap
+
+The one place Python's math *disagrees* with C/Java and bites in real
+problems: **Python floors, C truncates**.
+
+```python
+-7 // 2   # Python: -4  (floors toward -inf);  C/Java: -3 (truncates toward 0)
+-7 % 2    # Python:  1  (sign of divisor);     C/Java: -1 (sign of dividend)
+```
+
+[Basic Calculator II](/problems/0227-basic-calculator-ii) specifies
+truncation toward zero, so `//` is wrong on negative intermediate values
+(`-3 // 2` gives −2, spec wants −1). The idiom: `int(a / b)` for small
+values, or the sign-safe `-(-a // b) if (a < 0) != (b < 0) else a // b`.
+Corollary: `%` in Python always matches the divisor's sign — which is why
+`(i % n + n) % n` isn't needed in Python but is in Java. Knowing *which
+language does which* is exactly the cross-language depth an L5 loop probes.
+
+## Traps
+
+- **`~` in Python** is not "flip 32 bits" — ints are infinite-width;
+  emulate 32-bit with `& 0xFFFFFFFF` and a sign fix-up when a problem
+  demands hardware semantics.
+- **Operator precedence**: `==` binds tighter than `&`, so
+  `mask & 1 == 1` parses as `mask & (1 == 1)`. Parenthesize bit expressions,
+  always.
+- **`1 << i` with i from the wrong end** — decide bit 0 = item 0 and stick
+  to it; mixing endianness inside one solution is a silent killer.
+- **XOR "tricks" as a party trick** — the in-place XOR swap is trivia;
+  the *cancellation property* is the tool. Lead with the property.
+
+## What the interviewer asks next
+
+"Every element appears **three** times except one?" — XOR alone can't do it;
+count bits mod 3 per position (or the two-variable automaton). "Count bits
+of all numbers 0..n?" — DP on `i & (i-1)` or `i >> 1`. "Why is your subset
+loop 3ⁿ, not 4ⁿ?" — each element independently lands in one of three states.
+"Would this overflow in Java?" — yes/no plus the fix, delivered without
+looking up.
+
+## Practice ladder
+
+1. [Unique Paths](/problems/0062-unique-paths) — DP first, then the
+   `comb(m+n-2, m-1)` closed form; explain why they agree.
+2. [Basic Calculator II](/problems/0227-basic-calculator-ii) — the
+   truncation-vs-floor trap in a real parser; get negatives right.
+3. [Partition Equal Subset Sum](/problems/0416-partition-equal-subset-sum) —
+   solve the DP, then note the bitset speedup (`bits |= bits << num`) —
+   subset sums as one big integer's switches.
+4. Off-bank drills on LeetCode: 136 (Single Number — XOR cancellation), 191 /
+   338 (counting bits — `n & (n-1)` both ways), 78 via bitmask enumeration
+   (`range(1 << n)`) for the subset↔mask correspondence.
