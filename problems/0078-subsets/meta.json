@@ -1,0 +1,13 @@
+{
+  "id": 78,
+  "title": "Subsets",
+  "difficulty": "Medium",
+  "topics": ["Backtracking"],
+  "snowflake_priority": 2,
+  "follow_up": "0039-combination-sum",
+  "judge": {
+    "mode": "function",
+    "entry": "subsets",
+    "compare": "unordered_2d"
+  }
+}

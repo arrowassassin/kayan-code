@@ -1,0 +1,13 @@
+{
+  "id": 460,
+  "title": "LFU Cache",
+  "difficulty": "Hard",
+  "topics": ["Stream / Design"],
+  "snowflake_priority": 2,
+  "follow_up_of": "0146-lru-cache",
+  "judge": {
+    "mode": "methods",
+    "entry": "LFUCache",
+    "compare": "exact"
+  }
+}

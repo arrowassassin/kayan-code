@@ -51,9 +51,12 @@ The idioms built from them — each with its one-line why:
 sub = mask
 while sub:
     use(sub)
-    sub = (sub - 1) & mask   # next-smaller subset of mask; visits all of them
+    sub = (sub - 1) & mask   # next-smaller subset; visits every NON-empty subset
 ```
 
+The `while sub:` condition stops before `sub == 0`, so the **empty subset is
+skipped** — usually what you want in subset-DP (an empty part is rarely a
+legal choice); if you do need it, handle `sub = 0` once after the loop.
 Total work over all masks is O(3ⁿ) — each item is in mask-only / sub / out —
 a fact worth stating when you use it.
 
@@ -128,9 +131,12 @@ language does which* is exactly the cross-language depth an L5 loop probes.
 - **`~` in Python** is not "flip 32 bits" — ints are infinite-width;
   emulate 32-bit with `& 0xFFFFFFFF` and a sign fix-up when a problem
   demands hardware semantics.
-- **Operator precedence**: `==` binds tighter than `&`, so
-  `mask & 1 == 1` parses as `mask & (1 == 1)`. Parenthesize bit expressions,
-  always.
+- **Operator precedence — a cross-language split.** In Python, `&` binds
+  *tighter* than comparisons, so `mask & 1 == 1` means `(mask & 1) == 1` and
+  is safe. In C, C++, and Java it's the reverse — `==` binds tighter, so the
+  same line parses as `mask & (1 == 1)`, a classic silent bug. Parenthesize
+  bit expressions anyway, and *say why*: "Python gets this right, but I
+  parenthesize out of C habit" is free cross-language credibility.
 - **`1 << i` with i from the wrong end** — decide bit 0 = item 0 and stick
   to it; mixing endianness inside one solution is a silent killer.
 - **XOR "tricks" as a party trick** — the in-place XOR swap is trivia;
