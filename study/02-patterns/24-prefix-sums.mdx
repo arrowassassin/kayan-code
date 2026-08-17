@@ -1,0 +1,126 @@
+---
+title: Prefix sums
+section: 2 · Algorithm Patterns
+order: 24
+minutes: 15
+---
+
+# Prefix sums
+
+Highway distance markers don't tell you how long each stretch of road is —
+they tell you the total distance from the start. Want the length from marker
+120 to marker 185? Subtract: 65. No re-measuring the road. A **prefix sum
+array** is exactly that: `P[i]` = sum of the first `i` elements, precomputed
+once, and any range sum becomes one subtraction.
+
+```python
+P = [0]
+for x in nums:
+    P.append(P[-1] + x)
+# sum of nums[i..j] inclusive == P[j+1] - P[i]
+```
+
+The leading 0 is not decoration — it makes "range starting at index 0" work
+without a special case, and (later) it's the hash-map seed that catches
+subarrays starting at the beginning. Build cost O(n), every range query after
+that O(1). That's the whole core: **pay linear once, answer range-sum
+questions for free forever.**
+
+## Prefix + hashmap: subarray sums with a target
+
+The real interview weapon. "How many subarrays sum to k?" A subarray
+`i..j` sums to k exactly when `P[j+1] - P[i] == k`, i.e. `P[i] == P[j+1] - k`.
+So walk left to right, and at each position ask: *how many earlier prefix
+values equal my current prefix minus k?* A hash map of prefix-value → count
+answers in O(1):
+
+```python
+def subarray_sum(nums, k):
+    seen = defaultdict(int)
+    seen[0] = 1                 # empty prefix — subarrays starting at index 0
+    run = ans = 0
+    for x in nums:
+        run += x
+        ans += seen[run - k]    # each earlier equal-prefix is one subarray
+        seen[run] += 1
+    return ans
+```
+
+O(n) time, O(n) space, one sentence: "each element updates one running total
+and does one hash lookup." Forgetting `seen[0] = 1` is *the* classic bug —
+it silently drops every subarray that starts at the front.
+
+The same trick runs on a tree: [Path Sum III](/problems/0437-path-sum-iii)
+keeps a hash map of prefix sums **along the current root-to-node path** during
+DFS, and — crucially — decrements the count on the way back up, so one
+branch's prefixes can't leak into a sibling branch. Prefix-on-path is
+prefix-on-array plus backtracking hygiene.
+
+## When prefix beats window: negatives
+
+[Sliding windows](/study/02-patterns/21-sliding-window) need monotonicity:
+shrinking must move the sum one way. **Negative numbers break that** — and
+prefix+hashmap doesn't care, because it never shrinks anything; it just
+matches prefix values. This is the decision rule:
+
+| Question | All positive | Negatives allowed |
+|---|---|---|
+| shortest/longest subarray with sum ≥/= target | sliding window ([0209](/problems/0209-minimum-size-subarray-sum)) | prefix + hashmap (or prefix + monotonic deque for ≥) |
+| count subarrays with sum == k | either | prefix + hashmap only |
+
+Read the constraints line first; the sign of the inputs picks the pattern.
+And note the trade going the other way: with all-positive input, 0209's
+window is O(1) space while prefix costs O(n) — so window wins *when it's
+legal*.
+
+## Variants worth two sentences each
+
+**2-D prefix.** `P[r][c]` = sum of the rectangle from (0,0) to (r−1,c−1);
+build with `P[r][c] = grid + left + above − overlap`, and any rectangle sum is
+four lookups by inclusion–exclusion. Same trade: O(mn) build, O(1) per query.
+
+**XOR prefix.** XOR is its own inverse (`a ^ a = 0`), so
+`X[j+1] ^ X[i]` gives the XOR of any range, and the hashmap trick counts
+subarrays with a target XOR — identical skeleton, `^` instead of `+`.
+
+**Counts as sums.** "Subarrays with at most K odd numbers / distinct-ish
+properties" often reduce to prefix counts —
+[Subarrays with K Different Integers](/problems/0992-subarrays-with-k-different-integers)
+is solved with windows, but its atMost(K) − atMost(K−1) subtraction is
+prefix *thinking*: express "exactly" as a difference of two cumulative
+quantities. Recognizing that shape is the transferable skill.
+
+**Running mean.** [Moving Average](/problems/0346-moving-average-from-data-stream)
+is a prefix sum you keep only the tail of — a running total plus a queue.
+
+## Traps
+
+- **Off-by-one on the sentinel.** `P` has length n+1; `nums[i..j]` is
+  `P[j+1] - P[i]`. Write the identity in a comment before using it.
+- **Missing `seen[0] = 1`** (or its tree analog, `{0: 1}` at the root).
+- **Mutating counts without undoing them in DFS** — Path Sum III leaks
+  across branches without the decrement.
+- **Using prefix+hashmap for "shortest subarray sum ≥ k" with negatives** —
+  counting equal sums is a hashmap job, but *shortest with ≥* needs a
+  monotonic deque over prefixes (LC 862). Know that the follow-up exists.
+
+## What the interviewer asks next
+
+"Many range-sum queries on a static array?" — prefix, O(1) each. "Now the
+array gets point-updates between queries?" — prefix rebuilds are O(n), so
+name Fenwick/segment tree for O(log n) both; you rarely code them, you're
+expected to *know the boundary*. "Why not a sliding window here?" — the
+negatives sentence, delivered without hesitation.
+
+## Practice ladder
+
+1. [Moving Average from Data Stream](/problems/0346-moving-average-from-data-stream)
+   — running totals in their simplest streaming form.
+2. [Minimum Size Subarray Sum](/problems/0209-minimum-size-subarray-sum) —
+   solve with a window, then explain precisely why negatives would force
+   prefix sums; the contrast is the lesson.
+3. [Path Sum III](/problems/0437-path-sum-iii) — prefix + hashmap lifted onto
+   root-to-leaf paths, with the undo step.
+4. [Subarrays with K Different Integers](/problems/0992-subarrays-with-k-different-integers)
+   — cumulative-difference thinking (exactly = atMost − atMost) at full
+   difficulty.

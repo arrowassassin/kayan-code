@@ -1,0 +1,167 @@
+---
+title: The senior coding bar
+section: 5 · The Google Loop
+order: 51
+minutes: 22
+---
+
+# The senior coding bar
+
+Two carpenters build the same bookshelf. Both shelves hold books. But one
+carpenter measured the wall first, asked what the shelf would carry, chose
+screws over nails for a stated reason, and checked each shelf with a level
+before moving on. Same artifact, different *craft* — and the difference is
+visible to anyone watching them work. A Google coding round at L5 is graded
+on the carpenter, not the bookshelf. Correct code is the entry fee; the
+senior signals are everything wrapped around it.
+
+## Signal 1: driving ambiguity — the clarify gate
+
+Google interviewers under-specify **on purpose**. "Given a log of user
+events, find the busiest window" is missing: window length? timestamp
+format? sorted input? ties? size of the log? That vagueness *is the first
+question*, and it's testing the exact skill L5 engineers are paid for —
+turning a fuzzy ask into a precise contract before burning a quarter
+building the wrong thing.
+
+The L4 move is to ask a couple of questions when stuck. The L5 move is to
+**drive**: restate the problem, propose a concrete contract, and get a nod.
+
+> "Let me pin this down. I'll assume events arrive as (user_id, epoch_ms),
+> unsorted, up to ~10⁶ of them in memory; 'busiest window' means a fixed
+> 60-second window with the max event count; ties can return any. Does that
+> match what you had in mind?"
+
+Fifteen seconds. It hands the interviewer a sentence for the packet
+("candidate scoped the problem crisply") and it protects you: half of all
+rejected senior candidates who "did fine on code" solved a problem the
+interviewer didn't ask.
+
+## Signal 2: options before commitment
+
+Before writing code, name the solution *space*, not just a solution:
+
+> "Three options. Brute force: for each event, count neighbors in the window
+> — O(n²), fine only if n is tiny. Sort + sliding window: O(n log n), simple
+> and my default here. Bucket by second: O(n) but assumes a bounded time
+> range. Given unsorted input and n ≈ 10⁶, I'll sort and slide — the log
+> factor is cheap and the code stays obvious. OK to proceed?"
+
+This is thirty seconds and it's the single loudest L5 signal in the round.
+It shows the brute force (proving you see the baseline), the trade-off axis,
+and a *reasoned* commitment. It also buys insurance: if your chosen approach
+hits a wall, you've already laid out the fallback.
+
+## Signal 3: production instincts, unprompted
+
+Nobody will tell you to write clean code. They'll just write down whether
+you did.
+
+- **Naming.** `window_start`, `best_count` — not `i`, `x`, `tmp`. In a
+  45-minute round, names are the cheapest quality signal per keystroke.
+- **Decomposition.** When a function grows past ~20 lines or does two jobs,
+  split it and say so: "I'll pull parsing into its own helper so the core
+  loop stays readable." Seniors decompose *before* being asked.
+- **Edge cases as you go.** Say "empty input returns zero — handling that
+  first" while writing the guard, not after the interviewer asks.
+- **Testing without being told.** When the code is done, *you* initiate:
+  "Let me trace this: empty log, one event, two events straddling a window
+  boundary, all events in the same millisecond." Walk one trace line by
+  line, honestly — catching your own off-by-one during a self-trace is a
+  *positive* signal, not a blemish. Waiting for "can you test it?" is the
+  L4 tell interviewers cite most.
+
+## Signal 4: the escalating follow-up chain
+
+Google's signature move: the problem you solved was only chapter one.
+"Great — now the log doesn't fit in memory." "Now events arrive as a
+stream." "Now make it concurrent." The chain is calibrated to eventually
+exceed everyone; the grade is on how far you get *and how you behave at the
+frontier*.
+
+The graceful pattern, every time:
+
+1. **Name what broke.** "Sorting assumed the whole log fits in RAM — that's
+   the piece that dies."
+2. **Reach for the standard tool.** Doesn't fit in memory → external sort,
+   chunk + merge, or a single streaming pass. Stream → sliding structure
+   with eviction (deque, heap with lazy deletion). Concurrent → partition by
+   key, or name the shared structure and how you'd lock or shard it.
+3. **State the new cost** and what you traded away (exactness for memory,
+   latency for throughput).
+4. **At the frontier, think out loud honestly.** "I haven't built this
+   exact thing; here's how I'd reason about it…" beats a confident
+   bluff — interviewers probe bluffs, and a probed bluff is a bad
+   paragraph in the packet.
+
+The [archetypes chapter](/study/05-google/52-question-archetypes) drills the
+standard twists per pattern.
+
+## Signal 5: speed — finish *plus* follow-up
+
+The honest calibration: in 45 minutes, a strong L5 round usually means the
+main problem is scoped, coded, and self-tested with time left for at least
+one follow-up. Grinding out one correct solution as time expires is a lean
+round, not a strong one. Practically: if your first mock takes 40 minutes on
+a medium, your prep target is 25 — the surplus is where senior signals live.
+Speed comes from pattern fluency (sections 1–4), not typing faster.
+
+## The mechanics of the room
+
+- **Shared editor, you talk while you type.** Usually a collaborative doc
+  or code pane over video. Narrate at the level of intent ("evicting
+  everything left of the window here"), not syntax.
+- **Historically, no execution.** Many Google rounds have been plain
+  docs-without-running-code, and some still are; others use an editor that
+  runs. Teams and regions differ — **prepare for the stricter case**.
+  Practice in this app's whiteboard mode: no autocomplete, no run button.
+  Your trace-by-hand skill *is* your debugger in that room.
+- **Language:** Python is fully accepted; idiomatic use of `heapq`, `deque`,
+  `defaultdict` reads as fluency, not cheating.
+- **45 minutes,** a few of them reserved at the end for your questions.
+
+## What the written feedback looks like
+
+You never see it, but writing *for* it is the whole game.
+
+| Dimension | "Strong hire" reads like | "Lean hire" reads like |
+|---|---|---|
+| Problem solving | "identified the heap approach quickly after comparing alternatives" | "reached a working solution with some hints" |
+| Coding | "clean, decomposed, handled edge cases unprompted" | "correct but monolithic; edge cases after prompting" |
+| Communication | "narrated trade-offs; easy to follow throughout" | "went quiet during implementation; reasoning unclear" |
+| Follow-ups | "extended to the streaming variant with minimal guidance" | "struggled to adapt when constraints changed" |
+
+Notice every left-cell phrase contains an *unprompted* or a *compared*.
+"Lean hire" is not "bad" — it's "fine, with help." A packet of leans dies in
+committee; one lean among strongs usually survives.
+
+## L4 vs L5, same prompt
+
+Prompt: *"Design a rate limiter: at most N requests per user per minute."*
+(Bank versions: [Logger Rate Limiter](/problems/0359-logger-rate-limiter),
+[Design Hit Counter](/problems/0362-design-hit-counter).)
+
+| Moment | L4 answer | L5 answer |
+|---|---|---|
+| First 2 min | starts coding a dict of timestamp lists | "Fixed window or sliding? Burst behavior at boundaries matters — I'll assume sliding. Memory per user is bounded by N. Sound right?" |
+| Approach | one design, direct to code | "Timestamp deque per user: exact, O(N) memory. Token bucket: O(1) memory, approximate. I'll code the deque and can switch if memory is the concern." |
+| Code | works; single blob; `d`, `t`, `lst` | `allow(user_id, now_ms)` with an eviction helper; names carry meaning |
+| Testing | runs the example if asked | traces boundary case (request exactly 60s later) unprompted |
+| "10M users?" | "…use more memory?" | "Idle-user cleanup via lazy eviction or TTL; shard by user_id hash across limiter instances — per-user state makes sharding clean." |
+| "Distributed?" | stuck | "Centralized counts in Redis vs per-shard local limits: exactness vs latency. For rate limiting, approximate-but-fast usually wins; I'd accept small over-admission at shard boundaries." |
+
+Same problem. The L4 column is a *pass* at L4. At L5 it's the packet
+sentence you can't afford: "solid mid-level performance."
+
+## Drill it
+
+- [LRU Cache](/problems/0146-lru-cache) — production-quality class design,
+  the classic "clean code visible in 30 minutes" test
+- [Design Hit Counter](/problems/0362-design-hit-counter) — practice the
+  scoping monologue; then extend to the concurrency follow-up yourself
+- [Sliding Window Maximum](/problems/0239-sliding-window-maximum) — three
+  approaches with trade-offs; rehearse Signal 2 verbatim
+- [Find Median from Data Stream](/problems/0295-find-median-from-data-stream)
+  — solve, then self-escalate: "what if values arrive from 100 machines?"
+- [Text Justification](/problems/0068-text-justification) — no algorithmic
+  trick, pure production-instinct grading; do it in whiteboard mode

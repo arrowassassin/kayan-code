@@ -1,0 +1,182 @@
+---
+title: Binary search, without the off-by-ones
+section: 2 · Algorithm Patterns
+order: 22
+minutes: 25
+---
+
+# Binary search, without the off-by-ones
+
+Guessing a number between 1 and 100: every guess of "higher or lower" cuts
+the world in half, so 7 guesses always suffice. Everyone knows that part.
+What people *don't* know is how to write it without spending ten minutes
+sweating over `mid + 1` versus `mid`, `<` versus `<=`. The fix isn't
+memorizing a variant — it's writing the loop around an **invariant**.
+
+## The invariant-first template
+
+Picture the array painted two colors: everything where some condition is
+False, then everything where it's True. Binary search finds the boundary.
+Declare, before writing any code:
+
+> `lo` and everything left of it is **False**. `hi` and everything right of
+> it is **True**. The unknown zone is `[lo+1, hi-1]` — wait, simpler: keep
+> `lo` = "last known False" and `hi` = "first known True" as a *maintained
+> property*, and shrink the gap.
+
+The cleanest coding of that idea:
+
+```python
+def first_true(lo, hi, is_true):
+    # Precondition: is_true is monotone — F F F F T T T
+    # Invariant: answer is in [lo, hi]; hi is always a valid "True" candidate
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if is_true(mid):
+            hi = mid          # mid works — it might BE the answer, keep it
+        else:
+            lo = mid + 1      # mid fails — the answer is strictly right of it
+    return lo                 # lo == hi == first True
+```
+
+Every choice is now forced by the invariant, not memorized:
+
+- `hi = mid`, not `mid - 1` — `mid` tested True, so it's still a candidate;
+  throwing it away could discard the answer.
+- `lo = mid + 1` — `mid` tested False, so it can't be the answer; keeping it
+  would risk an infinite loop.
+- `while lo < hi`, and termination is safe: with `lo < hi`,
+  `(lo + hi) // 2` is always `< hi`, so `hi = mid` strictly shrinks the
+  range and `lo = mid + 1` obviously does. No infinite loop is possible.
+- Returns `lo` with no post-loop fix-ups.
+
+One template, and every classic is a one-line `is_true`:
+
+| Problem | `is_true(mid)` |
+|---|---|
+| find x in sorted array | `a[mid] >= x` (then check `a[lo] == x`) |
+| first element > x | `a[mid] > x` |
+| square root floor | `mid*mid > n` (answer is `lo - 1`) |
+| minimum in rotated array | `a[mid] <= a[-1]` |
+
+The senior habit: **say the invariant out loud** ("lo is always in the False
+region, hi always in the True region") before coding. It converts binary
+search from a bug lottery into bookkeeping — and it's exactly what the
+interviewer wants to hear when they ask "why doesn't this loop forever?"
+
+## bisect_left / bisect_right semantics
+
+Python hands you the template pre-built, and the two variants answer
+different questions about a sorted array `a` and value `x`:
+
+- `bisect_left(a, x)` — first index `i` with `a[i] >= x`. Insert here and
+  `x` lands **before** its equals. It's `first_true` with `a[mid] >= x`.
+- `bisect_right(a, x)` — first index with `a[i] > x`. Insert **after**
+  equals.
+- `bisect_right - bisect_left` = number of occurrences of `x`. Both are
+  `len(a)` when `x` is bigger than everything — no exceptions thrown, check
+  bounds yourself.
+
+Knowing which one you need without pausing is the difference between "uses
+the library" and "understands the library".
+
+## Rotated arrays, in one idea
+
+A sorted array rotated at a pivot ("4 5 6 7 0 1 2") isn't sorted, but it's
+**two sorted halves**, and `mid` always lands in one of them. Compare
+`a[mid]` against `a[hi]`: if `a[mid] <= a[hi]`, the right half is sorted, so
+the minimum (and the rotation point) is at `mid` or left of it — `hi = mid`.
+Otherwise the break is to the right — `lo = mid + 1`. That's just
+`first_true` with `is_true(mid) = a[mid] <= a[-1]` — the "am I past the
+rotation?" condition is monotone. Search-in-rotated-array adds one more step:
+after finding which sorted half contains the target, do ordinary binary
+search there (or decide half-by-half in one loop).
+
+## The senior weapon: binary search on the ANSWER
+
+This is the pattern that turns "I have no idea" into an O(n log range)
+algorithm, and it's a Google favorite. It applies whenever:
+
+1. The question is "minimize (or maximize) some value `v`", and
+2. You can write a checker `feasible(v)` that's **monotone**: if `v` works,
+   every larger `v` works too (F F F T T T over the answer space).
+
+Then you never construct the answer — you *guess* it and binary search the
+guesses.
+
+Classic framing — Koko eating bananas / ship packages in D days: "what's the
+minimum speed/capacity that finishes in time?" Feasibility is monotone (a
+faster eater always finishes what a slower one could), and the checker is a
+simple greedy simulation:
+
+```python
+def min_capacity(weights, days):
+    def feasible(cap):                    # can we ship everything in `days`?
+        d, load = 1, 0
+        for w in weights:
+            if load + w > cap:
+                d, load = d + 1, 0
+            load += w
+        return d <= days
+
+    lo, hi = max(weights), sum(weights)   # answer space, both bounds tight
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if feasible(mid):
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
+```
+
+Same `first_true` template — only the domain changed from *indices* to
+*candidate answers*. Complexity: O(n log(sum − max)); the log multiplies the
+checker's cost. The three things to narrate: the answer space bounds, the
+monotonicity of `feasible` (this is the correctness proof), and the checker's
+greedy validity.
+
+The same instinct — "the thing I need is monotone, so bisect for it" — shows
+up inside harder problems too. In [Maximum Profit in Job
+Scheduling](/problems/1235-maximum-profit-in-job-scheduling), after sorting
+jobs by end time, "the latest job that ends before this one starts" is a
+`bisect_right` over end times inside a DP. Binary search stops being a
+standalone algorithm and becomes a subroutine you reach for whenever sorted
+order exists.
+
+## Traps
+
+- **Non-monotone condition.** If `is_true` flickers T F T, binary search is
+  simply wrong. Verify monotonicity *first* — it's the precondition, not a
+  detail.
+- **`(lo + hi) // 2` overflow** — a non-issue in Python, but say
+  `lo + (hi - lo) // 2` exists for Java/C++ cred.
+- **Searching indices when you should search answers.** If the array isn't
+  sorted but the *answer space* is monotone, sort nothing — bisect the
+  answer.
+- **Forgetting the not-found check** after `bisect_left` — index in range
+  and value equal, both.
+
+## What the interviewer asks next
+
+"Why can't this loop forever?" (mid < hi always, both branches shrink).
+"What if there are duplicates in the rotated array?" (worst case degrades to
+O(n) — `a[mid] == a[hi]` gives no information, shrink `hi` by one). "How did
+you pick lo and hi for the answer space?" (must provably bracket the answer:
+`max(weights)` because one item must fit, `sum` because one day always
+works). "What's the complexity of the whole thing?" (log of answer range ×
+checker cost — know both factors).
+
+## Practice ladder
+
+1. [Two Sum II](/problems/0167-two-sum-ii) — solve it with `bisect_left` per
+   element instead of two pointers; feel both tools on one problem.
+2. [Kth Largest in an Array](/problems/0215-kth-largest-element-in-an-array)
+   — after the heap solution, try binary search on the answer value with a
+   count-≥-mid checker; it works and interviewers like hearing why.
+3. [Longest Increasing Subsequence](/problems/0300-longest-increasing-subsequence)
+   — the O(n log n) tails array is `bisect_left` doing surgical replacement.
+4. [Maximum Profit in Job Scheduling](/problems/1235-maximum-profit-in-job-scheduling)
+   — bisect over sorted end times inside a DP; binary search as a subroutine.
+5. Off-bank drill: LC 875 (Koko Eating Bananas) and LC 1011 (Ship Packages)
+   on LeetCode itself — the two canonical binary-search-on-answer problems,
+   worth 20 minutes each until the framing is reflex.

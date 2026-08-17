@@ -1,0 +1,159 @@
+---
+title: Advanced graphs, honestly scoped
+section: 3 · Graphs
+order: 33
+minutes: 15
+---
+
+# Advanced graphs, honestly scoped
+
+Past BFS, DFS, topo sort, and Dijkstra, the graph syllabus fans out into a
+long tail — and prep time is a budget. This chapter is a triage list for a
+senior loop: two tools you should genuinely own (union-find applications,
+bipartite coloring), one you should be able to sketch (Kruskal's MST), and a
+couple you should merely *recognize* so a follow-up question doesn't read as
+a gap. Over-investing in the rare stuff is a real failure mode; interviewers
+reward depth on the common tools far more than breadth on exotica.
+
+## Union-find: the connectivity workhorse
+
+Quick recap of the structure (covered in Data Structures): a forest of
+"who's my representative?" pointers with two moves — `find` follows pointers
+to the root, `union` merges two roots. With **path compression** (point every
+visited node straight at the root) and **union by size/rank**, each operation
+is amortized near-O(1) — inverse Ackermann, "constant for any input that fits
+in the universe" is the spoken line.
+
+```python
+class DSU:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.size = [1] * n
+        self.count = n                     # number of components
+
+    def find(self, x):
+        while self.parent[x] != x:
+            self.parent[x] = self.parent[self.parent[x]]  # compress
+            x = self.parent[x]
+        return x
+
+    def union(self, a, b):                 # returns False if already joined
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb:
+            return False
+        if self.size[ra] < self.size[rb]:
+            ra, rb = rb, ra
+        self.parent[rb] = ra
+        self.size[ra] += self.size[rb]
+        self.count -= 1
+        return True
+```
+
+Where it beats DFS: **edges arriving as a stream**. Counting components
+([Number of Connected Components](/problems/0323-number-of-connected-components-in-an-undirected-graph))
+is just `union` every edge and read `count`. Validating a tree
+([Graph Valid Tree](/problems/0261-graph-valid-tree)): a tree on n nodes is
+exactly n−1 edges with no `union` ever returning False — a False means the
+edge closed a cycle. Dynamic "are these connected *now*?" queries: union-find
+answers online; DFS would re-traverse each time.
+
+## Kruskal's MST (and Prim, by name)
+
+A **minimum spanning tree** connects all nodes with the cheapest possible
+total edge weight. Kruskal's is greedy in one line: *sort edges cheap-first;
+take each edge unless it closes a cycle* — and "closes a cycle" is exactly
+union-find's False.
+
+```python
+def mst_cost(n, edges):                    # edges: (w, u, v)
+    dsu = DSU(n)
+    return sum(w for w, u, v in sorted(edges) if dsu.union(u, v))
+```
+
+O(E log E) for the sort; the unions are ~free. Why greedy works, in one
+sentence: the cheapest edge crossing any cut must be in some MST (swap it in
+for any pricier crossing edge and total cost only drops) — the "cut
+property." **Prim's** is the alternative to name: grow one tree from a seed,
+always adding the cheapest edge leaving it — structurally Dijkstra with the
+heap keyed on edge weight instead of path length. Kruskal's is less code in
+Python; say so and code Kruskal's.
+
+## Bipartite check: two-color it
+
+A graph is **bipartite** if nodes split into two camps with every edge
+crossing camps — think "can we split people into two teams so no two
+teammates dislike each other?" Test by painting: BFS/DFS from each
+uncolored node, color it red, neighbors blue, their neighbors red… If you
+ever find an edge whose ends got the **same** color, some cycle forced a
+contradiction — and that happens exactly when the graph contains an
+odd-length cycle. Even cycles two-color fine (alternate around and it
+closes up); odd ones can't. O(V + E), and it's a visited set that stores one
+extra bit — if you can write BFS, you can write this on sight.
+
+## The rare shelf: know they exist
+
+**Bridges and articulation points** (Tarjan's low-link): a bridge is an edge
+whose removal disconnects the graph — "critical connections" in a network.
+The algorithm is one clever DFS tracking discovery times and the earliest
+ancestor reachable from each subtree, O(V + E). At Google this is genuinely
+rare — low-link bookkeeping is fiddly enough that it makes a poor 45-minute
+signal, and reports of it appearing are scarce. Right-sized prep: be able to
+*define* bridge/articulation point and say "Tarjan's low-link DFS, linear
+time, I'd need a minute to rederive the low-link update." That sentence is
+worth more than three evenings of drilling it.
+
+**Segment trees** (and BITs): a binary tree over array intervals giving
+O(log n) range queries *with updates* — the tool when both "range sum/min"
+and "point update" must be fast. Also rare in Google interviews (more of a
+competitive-programming staple); most "range" problems interviewers actually
+ask fall to prefix sums, sorting + heap, or a plain BST idea like
+[Job Scheduling](/problems/1235-maximum-profit-in-job-scheduling)'s
+binary-search DP. Know the shape, the O(log n) claim, and when you'd reach
+for one; skip memorizing the implementation unless everything else is
+polished.
+
+## Grid-graph tricks, recapped
+
+The senior-level grid move is **reversing the flow**.
+[Pacific Atlantic Water Flow](/problems/0417-pacific-atlantic-water-flow)
+asks which cells can drain to both oceans; simulating from every cell is
+O((mn)²). Instead flip the question — start BFS/DFS *from each ocean's
+border*, walking only **uphill** (the reverse of water's downhill edge), and
+intersect the two reachable sets: O(mn). The same inversion powered
+[Surrounded Regions](/problems/0130-surrounded-regions) (flood from the
+border to find the *un*-captured). Pattern to name out loud: "many sources,
+one question per cell → run the search backwards from the destinations."
+
+## Traps
+
+- Union-find on a **directed** reachability question — it only models
+  undirected connectivity. Direction matters ⇒ back to DFS/topo-sort land.
+- Forgetting path compression *and* union by size; with neither, `find`
+  degrades to O(n) chains.
+- Bipartite: coloring only from node 0 and missing other components.
+- Announcing "I'll use a segment tree" for a problem prefix sums solve —
+  reads as pattern-matching, not judgment.
+
+## What the interviewer asks next
+
+"Why does Kruskal's greedy choice never need undoing?" — the cut property,
+one sentence above. "Union-find vs DFS for components?" — DFS when the graph
+is static and given whole; union-find when edges stream in or queries are
+online. "Is a tree bipartite?" — always: no cycles, so no odd cycles.
+"Delete an edge and re-ask connectivity?" — union-find can't un-union;
+that's offline reversal or link-cut territory — name it as out of scope and
+offer the offline trick if pressed.
+
+## Practice ladder
+
+1. [Number of Connected Components](/problems/0323-number-of-connected-components-in-an-undirected-graph)
+   — union-find in its purest form; also solve it with DFS and compare.
+2. [Graph Valid Tree](/problems/0261-graph-valid-tree) — cycle-by-union plus
+   the n−1 edge count; trains the "False means cycle" reflex.
+3. [Surrounded Regions](/problems/0130-surrounded-regions) — border-first
+   flooding; the warm-up for reverse-flow thinking.
+4. [Pacific Atlantic Water Flow](/problems/0417-pacific-atlantic-water-flow)
+   — full reverse-flow with two searches and a set intersection.
+5. [Job Scheduling](/problems/1235-maximum-profit-in-job-scheduling) — the
+   "you thought you needed a segment tree" problem; sort + binary search + DP
+   does it.

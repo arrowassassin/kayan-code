@@ -61,12 +61,11 @@ def reverse(head):
     while cur:
         nxt = cur.next        # save before you overwrite!
         cur.next = prev       # flip the arrow
-        prev, cur = nxt and prev or prev, cur  # (see below)
         prev, cur = cur, nxt  # advance both
     return prev               # prev is the new head
 ```
 
-(The real loop body is the three clean lines: save, flip, advance.) The
+Save, flip, advance — in that order, every iteration. The
 invariant: *everything before `cur` is reversed and reachable from `prev`;
 everything from `cur` on is untouched.* O(n) time, O(1) space. The recursive
 version exists but costs O(n) stack — say so if asked.
