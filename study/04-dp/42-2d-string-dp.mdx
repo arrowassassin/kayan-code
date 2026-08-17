@@ -50,7 +50,7 @@ If not, drop the last character of one string or the other — best of up/left.
 
 ```mermaid
 graph TD
-    subgraph LCS at dp i j
+    subgraph LCS["LCS transition at dp[i][j]"]
         M["a[i-1] == b[j-1]?"] -->|yes| D["diag + 1<br/>(keep the match)"]
         M -->|no| U["max(up, left)<br/>(drop one char)"]
     end
@@ -78,7 +78,7 @@ match):
 
 ```mermaid
 graph TD
-    subgraph Edit distance at dp i j
+    subgraph ED["Edit-distance transition at dp[i][j]"]
         M2["a[i-1] == b[j-1]?"] -->|yes| D2["diag + 0<br/>(free)"]
         M2 -->|no| T["1 + min(diag, up, left)<br/>replace / delete / insert"]
     end

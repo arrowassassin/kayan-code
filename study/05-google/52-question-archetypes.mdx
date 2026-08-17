@@ -1,0 +1,280 @@
+---
+title: Google question archetypes
+section: 5 · The Google Loop
+order: 52
+minutes: 25
+---
+
+# Google question archetypes
+
+Google retires any question that leaks, so memorizing specific problems is a
+losing bet. But the *shapes* don't retire. Interviewers pick questions that
+let them escalate cleanly (see [the follow-up chain](/study/05-google/51-senior-coding-bar)),
+and only a handful of shapes escalate well — which is why thousands of
+candidate reports keep describing the same eight families. Learn to
+recognize the family in the first thirty seconds, and every question becomes
+a variant of something you've already beaten. (One honesty note up front:
+question mix varies by interviewer taste and team; this is the distribution
+candidates most commonly report, not a syllabus Google publishes.)
+
+## 1. Grid & graph traversal
+
+**Recognition:** a 2-D board, a map of anything ("islands", "walls",
+"pixels", "pipes"), prerequisites/dependencies, "shortest path", "can you
+reach", multi-source spreading ("rotting", "fire", "water"). If the input
+draws as dots-and-lines, it's this. Google's single most reported coding
+family.
+
+**Core kit:** BFS for shortest-anything on unweighted graphs, DFS/union-find
+for connectivity, topological sort for dependencies, multi-source BFS for
+spreading. Know [section 3](/study) cold.
+
+**Bank set:**
+[Number of Islands](/problems/0200-number-of-islands) ·
+[Rotting Oranges](/problems/0994-rotting-oranges) ·
+[Pacific Atlantic Water Flow](/problems/0417-pacific-atlantic-water-flow) ·
+[Course Schedule II](/problems/0210-course-schedule-ii) ·
+[Word Ladder](/problems/0127-word-ladder) ·
+[Shortest Path in Binary Matrix](/problems/1091-shortest-path-in-binary-matrix) ·
+[Graph Valid Tree](/problems/0261-graph-valid-tree)
+
+**External reps:** LC 79 Word Search · LC 542 01 Matrix · LC 787 Cheapest
+Flights Within K Stops · LC 1197 Minimum Knight Moves
+
+## 2. String parsing & simulation
+
+**Recognition:** "validate this string", "implement this format", version
+numbers, file paths, calculators, log lines. No clever algorithm — the test
+is whether your edge-case discipline survives contact with `"+.e8"`,
+trailing spaces, and empty tokens. Google *loves* these for senior loops
+precisely because they grade production instincts, not memorized tricks.
+
+**Core kit:** tokenize first, then process — never both at once; a state
+machine when characters have modes; write the edge-case list *before* the
+code.
+
+**Bank set:**
+[Valid Number](/problems/0065-valid-number) ·
+[Basic Calculator II](/problems/0227-basic-calculator-ii) ·
+[Text Justification](/problems/0068-text-justification) ·
+[Simplify Path](/problems/0071-simplify-path) ·
+[Compare Version Numbers](/problems/0165-compare-version-numbers) ·
+[Reorder Data in Log Files](/problems/0937-reorder-data-in-log-files) ·
+[Decode String](/problems/0394-decode-string)
+
+**External reps:** LC 224 Basic Calculator · LC 8 String to Integer (atoi) ·
+LC 273 Integer to English Words · LC 158 Read N Characters Given Read4 II
+
+## 3. Intervals & sweep line
+
+**Recognition:** anything with start/end pairs — meetings, bookings, CPU
+jobs, free time. The word "overlap" or a picture of bars on a timeline.
+
+**Core kit:** sort by start; the merge-or-extend loop; min-heap of end times
+for "how many at once"; the +1/−1 event-sweep trick.
+
+**Bank set:**
+[Merge Intervals](/problems/0056-merge-intervals) ·
+[Insert Interval](/problems/0057-insert-interval) ·
+[Meeting Rooms II](/problems/0253-meeting-rooms-ii) ·
+[Non-overlapping Intervals](/problems/0435-non-overlapping-intervals) ·
+[Employee Free Time](/problems/0759-employee-free-time)
+
+**External reps:** LC 986 Interval List Intersections · LC 729 My Calendar I
+· LC 218 The Skyline Problem
+
+## 4. Top-k, heaps & streaming
+
+**Recognition:** "k largest/closest/most frequent", "median of a stream",
+merging k sorted anythings, scheduling with priorities. The word "stream"
+or "as data arrives" is a flashing sign.
+
+**Core kit:** size-k min-heap for top-k (say the O(n log k) sentence);
+two-heap median; `heapq.merge` mental model for k-way merge; quickselect as
+the trade-off alternative you *name* even if you code the heap.
+
+**Bank set:**
+[Kth Largest Element in an Array](/problems/0215-kth-largest-element-in-an-array) ·
+[Top K Frequent Elements](/problems/0347-top-k-frequent-elements) ·
+[Top K Frequent Words](/problems/0692-top-k-frequent-words) ·
+[K Closest Points to Origin](/problems/0973-k-closest-points-to-origin) ·
+[Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists) ·
+[Find Median from Data Stream](/problems/0295-find-median-from-data-stream) ·
+[Kth Largest Element in a Stream](/problems/0703-kth-largest-element-in-a-stream)
+
+**External reps:** LC 621 Task Scheduler *(also in bank:
+[Task Scheduler](/problems/0621-task-scheduler))* · LC 358 Rearrange String
+k Distance Apart · LC 502 IPO
+
+## 5. Dynamic programming (incl. weighted scheduling)
+
+**Recognition:** "max/min/count ways" over sequences or grids, "can you
+partition", jobs with profits and conflicts. Google's DP taste runs
+practical — string DP and scheduling DP over exotic bitmask acrobatics.
+
+**Core kit:** define the state in one English sentence before any code;
+1-D rolling arrays; the sorted-jobs + binary-search recurrence for weighted
+interval scheduling. [Section 4](/study) is the deep dive.
+
+**Bank set:**
+[Word Break](/problems/0139-word-break) ·
+[Coin Change](/problems/0322-coin-change) ·
+[Edit Distance](/problems/0072-edit-distance) ·
+[Longest Increasing Subsequence](/problems/0300-longest-increasing-subsequence) ·
+[Decode Ways](/problems/0091-decode-ways) ·
+[Maximum Profit in Job Scheduling](/problems/1235-maximum-profit-in-job-scheduling)
+
+**External reps:** LC 552 Student Attendance Record II · LC 329 Longest
+Increasing Path in a Matrix · LC 3186 (or any recent weighted-take
+variant) — but classics first: LC 1048 Longest String Chain
+
+## 6. Design-a-class & stream processing
+
+**Recognition:** "Design a data structure that supports…", "Implement a
+class…", rate limiters, hit counters, caches, iterators. Half coding
+problem, half miniature system design — the archetype most likely to carry
+a concurrency or scale follow-up.
+
+**Core kit:** state the API contract and complexity target per method
+*before* implementing; lazy cleanup vs eager cleanup as a spoken trade-off;
+know why `dict` + doubly-linked list beats everything for LRU.
+
+**Bank set:**
+[LRU Cache](/problems/0146-lru-cache) ·
+[Logger Rate Limiter](/problems/0359-logger-rate-limiter) ·
+[Design Hit Counter](/problems/0362-design-hit-counter) ·
+[Moving Average from Data Stream](/problems/0346-moving-average-from-data-stream) ·
+[Insert Delete GetRandom O(1)](/problems/0380-insert-delete-getrandom)
+
+**External reps:** LC 460 LFU Cache · LC 981 Time Based Key-Value Store ·
+LC 341 Flatten Nested List Iterator · LC 715 Range Module
+
+## 7. Binary search on the answer
+
+**Recognition:** "minimize the maximum" or "maximize the minimum" of
+something — smallest capacity that works, slowest speed that finishes in
+time, largest gap you can guarantee. The giveaway: checking whether a
+*guessed* answer works is easy, but finding it directly is hard.
+
+**Core kit:** the feasibility predicate must be **monotonic** (if capacity
+c works, c+1 works); binary search the answer space, not the array; say the
+O(n log range) sentence.
+
+**Bank set:** the bank is thin here on purpose — this shape is mostly
+external. Closest neighbors:
+[Minimum Size Subarray Sum](/problems/0209-minimum-size-subarray-sum)
+(solve it the O(n log n) prefix + binary search way as a rep) and
+[Kth Largest Element in an Array](/problems/0215-kth-largest-element-in-an-array)
+(quickselect's partition-and-narrow is the same instinct).
+
+**External reps (do all four):** LC 875 Koko Eating Bananas · LC 1011
+Capacity to Ship Packages · LC 410 Split Array Largest Sum · LC 774
+Minimize Max Distance to Gas Station
+
+## 8. Backtracking & enumeration
+
+**Recognition:** "all combinations/permutations/valid arrangements",
+"count the ways" with tiny n (n ≤ 20 in the constraints is the tell — see
+[budget math](/study/00-foundations/01-big-o)), board placement, expression
+building.
+
+**Core kit:** the choose → recurse → un-choose template; prune early and
+say what the prune saves; know the output-sensitive complexity sentence
+("O(number of solutions × cost to build each").
+
+**Bank set:** thin in the bank — [Word Break](/problems/0139-word-break)
+(the memoized cousin) and
+[Path Sum III](/problems/0437-path-sum-iii) (DFS enumeration on trees) are
+the nearest reps; get the pure form externally.
+
+**External reps (do all four):** LC 78 Subsets · LC 39 Combination Sum ·
+LC 22 Generate Parentheses · LC 51 N-Queens
+
+## The Google twist: follow-up chains
+
+Any archetype above can be escalated with one of three stock twists. This
+table is worth more than ten extra problems — rehearse the *transitions*:
+
+| Twist | What breaks | Standard adaptation |
+|---|---|---|
+| "Input doesn't fit in memory" | anything that sorts/holds all data | chunk + external merge sort; one streaming pass with O(k) state; approximate sketches (mention Count-Min / reservoir sampling by name for top-k) |
+| "Now it's a stream" | global passes, look-ahead | maintain a live structure with eviction: deque (windows), two heaps (median), size-k heap (top-k); state what you *lose* (no second pass, sometimes exactness) |
+| "Now make it concurrent" | shared mutable state | partition by key so shards never share state (the answer 80% of the time); else name the contention point and pick lock / lock-free / single-writer, with the trade-off |
+
+Per archetype, the twist usually lands like this:
+
+- **Grid/graph** → graph too big for memory: adjacency streamed from disk,
+  or frontier-at-a-time BFS; partition the graph and note that edges
+  crossing partitions are the hard part.
+- **Top-k** → the canonical chain: array → stream (size-k heap) → doesn't
+  fit anywhere (per-machine top-k, merge the k-lists; or sketch + candidate
+  verification pass).
+- **Intervals** → events arrive out of order in a stream: buffer with a
+  watermark, admit lateness, or say what reordering window you assume —
+  saying "I need to define allowed lateness" is itself the senior answer.
+- **Design-a-class** → concurrent: which methods race, per-key sharding of
+  the internal map, and for counters, "approximately correct but fast beats
+  exactly correct but serialized."
+- **DP** → rarely streamed; the twist is usually "n is now 10⁹" → find the
+  O(1)-state recurrence or matrix exponentiation, or admit the model
+  changes.
+
+The chain is graded on composure and structure, not completion — re-read
+Signal 4 in [the senior coding bar](/study/05-google/51-senior-coding-bar).
+
+## The 40-problem hit list
+
+Priority order — top of the list is highest expected value per hour. Bank
+problems link; externals are LC ids. Tier 1 in week 1, tier 2 in week 2
+mocks, tier 3 as stretch.
+
+**Tier 1 — the core sixteen (do untimed, then redo in mock mode):**
+1. [Number of Islands](/problems/0200-number-of-islands)
+2. [Rotting Oranges](/problems/0994-rotting-oranges)
+3. [Course Schedule II](/problems/0210-course-schedule-ii)
+4. [Merge Intervals](/problems/0056-merge-intervals)
+5. [Meeting Rooms II](/problems/0253-meeting-rooms-ii)
+6. [Top K Frequent Elements](/problems/0347-top-k-frequent-elements)
+7. [Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists)
+8. [LRU Cache](/problems/0146-lru-cache)
+9. [Find Median from Data Stream](/problems/0295-find-median-from-data-stream)
+10. [Word Break](/problems/0139-word-break)
+11. [Coin Change](/problems/0322-coin-change)
+12. [Basic Calculator II](/problems/0227-basic-calculator-ii)
+13. [Valid Number](/problems/0065-valid-number)
+14. LC 875 Koko Eating Bananas
+15. LC 78 Subsets
+16. LC 22 Generate Parentheses
+
+**Tier 2 — breadth and twists (mock-mode first attempt):**
+17. [Pacific Atlantic Water Flow](/problems/0417-pacific-atlantic-water-flow)
+18. [Word Ladder](/problems/0127-word-ladder)
+19. [Shortest Path in Binary Matrix](/problems/1091-shortest-path-in-binary-matrix)
+20. [Insert Interval](/problems/0057-insert-interval)
+21. [Employee Free Time](/problems/0759-employee-free-time)
+22. [Kth Largest Element in an Array](/problems/0215-kth-largest-element-in-an-array) — heap *and* quickselect
+23. [Task Scheduler](/problems/0621-task-scheduler)
+24. [Design Hit Counter](/problems/0362-design-hit-counter) — plus the concurrency follow-up out loud
+25. [Insert Delete GetRandom O(1)](/problems/0380-insert-delete-getrandom)
+26. [Text Justification](/problems/0068-text-justification) — whiteboard mode, no exceptions
+27. [Decode String](/problems/0394-decode-string)
+28. [Maximum Profit in Job Scheduling](/problems/1235-maximum-profit-in-job-scheduling)
+29. [Edit Distance](/problems/0072-edit-distance)
+30. [Longest Increasing Subsequence](/problems/0300-longest-increasing-subsequence)
+31. LC 410 Split Array Largest Sum
+32. LC 1011 Capacity to Ship Packages
+33. LC 79 Word Search
+34. LC 39 Combination Sum
+
+**Tier 3 — stretch and polish:**
+35. [Sliding Window Maximum](/problems/0239-sliding-window-maximum) — then the streaming framing
+36. [Serialize and Deserialize Binary Tree](/problems/0297-serialize-and-deserialize-binary-tree)
+37. [Vertical Order Traversal of a Binary Tree](/problems/0987-vertical-order-traversal-of-a-binary-tree) — tie-breaking edge-case discipline
+38. LC 460 LFU Cache
+39. LC 218 The Skyline Problem
+40. LC 51 N-Queens
+
+Forty problems, done the L5 way — scoped out loud, alternatives named,
+self-tested, then self-escalated with one twist from the table — beat four
+hundred done silently. The rep you're training isn't the solution; it's the
+performance around it.
