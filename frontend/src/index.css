@@ -129,6 +129,60 @@ body {
   background: none;
   padding: 0;
 }
+
+/* highlight.js tokens — One-Dark palette, matched to the CodeMirror editor */
+.md .hljs-comment,
+.md .hljs-quote {
+  color: #7f8c98;
+  font-style: italic;
+}
+.md .hljs-keyword,
+.md .hljs-selector-tag,
+.md .hljs-literal,
+.md .hljs-type {
+  color: #c678dd;
+}
+.md .hljs-string,
+.md .hljs-regexp,
+.md .hljs-addition {
+  color: #98c379;
+}
+.md .hljs-number,
+.md .hljs-symbol,
+.md .hljs-bullet,
+.md .hljs-meta {
+  color: #d19a66;
+}
+.md .hljs-title,
+.md .hljs-title.function_,
+.md .hljs-function .hljs-title,
+.md .hljs-section {
+  color: #61afef;
+}
+.md .hljs-title.class_,
+.md .hljs-built_in {
+  color: #e5c07b;
+}
+.md .hljs-variable,
+.md .hljs-template-variable,
+.md .hljs-attr,
+.md .hljs-attribute,
+.md .hljs-name,
+.md .hljs-selector-id,
+.md .hljs-selector-class,
+.md .hljs-deletion {
+  color: #e06c75;
+}
+.md .hljs-operator,
+.md .hljs-punctuation {
+  color: #abb2bf;
+}
+.md .hljs-emphasis {
+  font-style: italic;
+}
+.md .hljs-strong {
+  font-weight: 700;
+}
 .md blockquote {
   border-left: 3px solid var(--color-accent);
   margin: 0.7rem 0;
