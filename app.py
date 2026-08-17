@@ -582,6 +582,68 @@ def get_review(sid: int):
     return {"cached": True, "model": row["model"], "review": json.loads(row["content"])}
 
 
+# ---------------------------------------------------------------- API: study
+
+STUDY_DIR = os.path.join(ROOT, "study")
+
+
+def parse_frontmatter(text):
+    """Minimal ----delimited frontmatter: key: value lines. Returns (meta, body)."""
+    if not text.startswith("---"):
+        return {}, text
+    try:
+        _, fm, body = text.split("---", 2)
+    except ValueError:
+        return {}, text
+    meta = {}
+    for line in fm.strip().splitlines():
+        if ":" in line:
+            k, v = line.split(":", 1)
+            v = v.strip().strip('"').strip("'")
+            meta[k.strip()] = int(v) if v.isdigit() else v
+    return meta, body.lstrip("\n")
+
+
+@app.get("/api/study")
+def study_index():
+    """Tree of study sections -> ordered chapters (from .mdx frontmatter)."""
+    if not os.path.isdir(STUDY_DIR):
+        return []
+    sections = {}
+    for dirpath, _dirs, files in os.walk(STUDY_DIR):
+        for fname in sorted(files):
+            if not fname.endswith((".mdx", ".md")):
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, fname), STUDY_DIR)
+            meta, _ = parse_frontmatter(_read(os.path.join(dirpath, fname)))
+            section = meta.get("section") or os.path.dirname(rel) or "General"
+            sections.setdefault(section, []).append({
+                "path": rel.replace(os.sep, "/"),
+                "title": meta.get("title", fname.rsplit(".", 1)[0]),
+                "order": meta.get("order", 999),
+                "minutes": meta.get("minutes"),
+            })
+    out = []
+    for section, chapters in sections.items():
+        chapters.sort(key=lambda c: (c["order"], c["title"]))
+        out.append({
+            "section": section,
+            "order": min(c["order"] for c in chapters),
+            "chapters": chapters,
+        })
+    out.sort(key=lambda s: s["order"])
+    return out
+
+
+@app.get("/api/study/{path:path}")
+def study_chapter(path: str):
+    full = os.path.normpath(os.path.join(STUDY_DIR, path))
+    if not full.startswith(STUDY_DIR) or not os.path.isfile(full):
+        raise HTTPException(404, "No such study chapter")
+    meta, body = parse_frontmatter(_read(full))
+    return {"path": path, "meta": meta, "content": body}
+
+
 # ---------------------------------------------------------------- API: dashboard
 
 @app.get("/api/stats")

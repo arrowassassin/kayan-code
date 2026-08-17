@@ -20,6 +20,7 @@ export function Shell() {
         <nav className="flex gap-1">
           {[
             { to: '/', label: 'Problems' },
+            { to: '/study', label: 'Study' },
             { to: '/mock', label: 'Mock Interview' },
             { to: '/dashboard', label: 'Dashboard' },
           ].map((l) => (

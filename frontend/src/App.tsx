@@ -17,6 +17,9 @@ const MockPage = lazy(() =>
 const DashboardPage = lazy(() =>
   import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
+const StudyPage = lazy(() =>
+  import('@/pages/StudyPage').then((m) => ({ default: m.StudyPage })),
+)
 
 function Loading() {
   return (
@@ -43,6 +46,7 @@ const router = createBrowserRouter([
       { path: '/', element: withSuspense(<ProblemsPage />) },
       { path: '/problems/:slug', element: withSuspense(<ProblemPage />) },
       { path: '/mock', element: withSuspense(<MockPage />) },
+      { path: '/study/*', element: withSuspense(<StudyPage />) },
       { path: '/dashboard', element: withSuspense(<DashboardPage />) },
     ],
   },

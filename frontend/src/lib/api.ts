@@ -210,4 +210,22 @@ export const api = {
     ),
   stats: () => request<Stats>('/api/stats'),
   daily: () => request<Daily>('/api/daily'),
+  studyIndex: () => request<StudySection[]>('/api/study'),
+  studyChapter: (path: string) =>
+    request<{ path: string; meta: Record<string, string | number>; content: string }>(
+      `/api/study/${path}`,
+    ),
+}
+
+export interface StudyChapterRef {
+  path: string
+  title: string
+  order: number
+  minutes: number | null
+}
+
+export interface StudySection {
+  section: string
+  order: number
+  chapters: StudyChapterRef[]
 }
