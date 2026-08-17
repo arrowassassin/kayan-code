@@ -1,0 +1,186 @@
+---
+title: Two pointers
+section: 2 · Algorithm Patterns
+order: 20
+minutes: 20
+---
+
+# Two pointers
+
+Two people search a bookshelf for a pair of books whose heights add to exactly
+one meter. The dumb way: each person checks every pair — O(n²). The smart way:
+**sort the shelf first**, put one person at the short end and one at the tall
+end, and let them walk toward each other. Too short? The left person steps
+right. Too tall? The right person steps left. One pass, O(n).
+
+That's the whole pattern: replace "check every pair" with "two indices moving
+under a rule", and the rule is what makes it correct.
+
+## The precondition nobody says out loud
+
+Converging two pointers only works when moving a pointer lets you **safely
+discard every pair you're skipping**. Almost always that safety comes from
+**sorted input** (or some monotone structure). If the input isn't sorted and
+the problem is about *values* (pair sums, closeness), your first thought should
+be: "can I sort? Does sorting destroy anything I need — like original
+indices?" If indices matter, sort `(value, index)` pairs or reach for a
+hash map instead.
+
+## Converging pointers, and the argument that makes them legal
+
+Skeleton for "find a pair summing to target" in a sorted array
+([Two Sum II](/problems/0167-two-sum-ii)):
+
+```python
+def pair_sum(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo < hi:
+        s = nums[lo] + nums[hi]
+        if s == target:
+            return [lo, hi]
+        if s < target:
+            lo += 1      # nums[lo] is too small for ANY partner ≤ hi
+        else:
+            hi -= 1      # nums[hi] is too big for ANY partner ≥ lo
+    return []
+```
+
+The comment is the proof. When `s < target`, `nums[hi]` is the *largest*
+remaining candidate; if even it can't rescue `nums[lo]`, no smaller element
+can, so every pair involving `lo` is dead — discard `lo` entirely. Each step
+kills one index for a justified reason, so we never skip a valid answer. This
+is called an **exchange / dominance argument**: the pair you skip is
+*dominated* by pairs you still might visit.
+
+### Container With Most Water, the proof interviewers want
+
+[Container With Most Water](/problems/0011-container-with-most-water): two
+lines at `lo` and `hi`, area = `(hi - lo) * min(h[lo], h[hi])`. Move the
+**shorter** side inward. Why is that safe?
+
+Say `h[lo] < h[hi]`. Consider any container keeping `lo` but using some
+`j < hi`. Its width is smaller than now, and its height is still capped at
+`min(h[lo], h[j]) ≤ h[lo]` — the short side can't get taller by keeping it.
+So *every* container that keeps the shorter line is ≤ the current area, which
+we've already recorded. Discarding `lo` loses nothing. That's the dominance
+argument, spelled out — say it in the interview; the pattern without the proof
+is a mid-level answer, the proof is the senior one.
+
+```python
+def max_area(h):
+    lo, hi, best = 0, len(h) - 1, 0
+    while lo < hi:
+        best = max(best, (hi - lo) * min(h[lo], h[hi]))
+        if h[lo] < h[hi]:
+            lo += 1
+        else:
+            hi -= 1
+    return best
+```
+
+O(n): each step retires one index forever.
+
+## Same-direction pointers: reader and writer
+
+The second flavor isn't about pairs at all. One pointer **reads** every
+element; a slower pointer marks where the next **kept** element should be
+**written**. This is how you do in-place filtering with O(1) extra space.
+
+[Remove Duplicates II](/problems/0080-remove-duplicates-from-sorted-array-ii)
+— keep at most two copies of each value:
+
+```python
+def remove_duplicates(nums):
+    write = 0
+    for x in nums:                      # read pointer
+        if write < 2 or x != nums[write - 2]:
+            nums[write] = x
+            write += 1
+    return write
+```
+
+The invariant: `nums[:write]` is exactly the answer built so far, and `write`
+never passes the read pointer, so we never overwrite unread data. The
+condition `x != nums[write - 2]` works because the array is sorted — a third
+copy would collide with the element two slots back.
+
+[Sort Colors](/problems/0075-sort-colors) pushes this to **three** regions —
+the Dutch national flag. Maintain `[0:lo)` all 0s, `[lo:mid)` all 1s,
+`[hi+1:]` all 2s, with `[mid:hi]` unknown:
+
+```python
+def sort_colors(nums):
+    lo, mid, hi = 0, 0, len(nums) - 1
+    while mid <= hi:
+        if nums[mid] == 0:
+            nums[lo], nums[mid] = nums[mid], nums[lo]
+            lo += 1; mid += 1
+        elif nums[mid] == 1:
+            mid += 1
+        else:
+            nums[mid], nums[hi] = nums[hi], nums[mid]
+            hi -= 1               # NOT mid += 1 — the swapped-in value is unread
+```
+
+The classic trap is in the last branch: the value swapped down from `hi` is
+unexamined, so `mid` must stay put. If you can state the three-region
+invariant, that trap becomes impossible instead of memorized.
+
+## The pair-sum family: 167 → 3Sum
+
+[3Sum](/problems/0015-3sum) is just pair-sum wearing a for-loop: sort, fix the
+first element `nums[i]`, then run converging pointers on the rest for target
+`-nums[i]`. O(n²) total, and n ≤ 3000 makes that the intended budget.
+
+The part that separates candidates is **dedup discipline** — the output wants
+unique triples, and sorted input makes duplicates adjacent:
+
+1. Skip repeated anchors: `if i > 0 and nums[i] == nums[i-1]: continue`.
+2. After recording a hit, advance `lo` past equal values (`while lo < hi and
+   nums[lo] == nums[lo-1]: lo += 1`) — and keep moving *both* pointers, since
+   the same `lo` value can't form a new distinct triple with any other `hi`.
+
+Miss these and you either emit duplicates or, worse, patch it with a
+`set` of tuples — which works but signals you didn't see the structure.
+
+## Pattern signature
+
+| Flavor | Precondition | Invariant you maintain | Canonical problems |
+|---|---|---|---|
+| Converging | sorted / monotone bound | skipped pairs are dominated | 0167, 0011, 0015 |
+| Read/write | order-preserving filter | `[:write]` = answer so far | 0080, 0443 |
+| Multi-region | in-place partition | labeled regions + unknown zone | 0075 |
+
+## Traps
+
+- **Sorting when indices matter.** Two Sum I wants original indices — hash
+  map, not sort-and-point.
+- **`lo <= hi` vs `lo < hi`.** Converging pair search uses `<` (a pointer
+  can't pair with itself); Dutch flag uses `<=` (the unknown zone includes
+  both ends).
+- **Moving the wrong pointer** in 0011 — moving the taller side has no
+  justification, and an interviewer will ask you why yours is safe.
+
+## What the interviewer asks next
+
+"What if the array can't be sorted?" (hash map, O(n) time O(n) space — know
+the trade.) "4Sum?" (another anchor loop, O(n³), or pair-sum meet-in-middle.)
+"Can you do Sort Colors in one pass?" (that *is* the Dutch flag — counting
+sort is two passes.) And always: "why is it correct to move that pointer?" —
+the dominance sentence is the answer they're fishing for.
+
+## Practice ladder
+
+1. [Valid Palindrome](/problems/0125-valid-palindrome) — the gentlest
+   converging pair; trains the skip-non-alnum loop.
+2. [Two Sum II](/problems/0167-two-sum-ii) — the canonical converging
+   argument in its purest form.
+3. [Remove Duplicates II](/problems/0080-remove-duplicates-from-sorted-array-ii)
+   — read/write pointers and the `write - 2` trick.
+4. [Sort Colors](/problems/0075-sort-colors) — three-region invariant; watch
+   the `hi`-swap trap.
+5. [3Sum](/problems/0015-3sum) — anchor loop + converging pair + dedup
+   discipline, the full package.
+6. [Trapping Rain Water](/problems/0042-trapping-rain-water) — converging
+   pointers where the invariant is "the shorter side's water level is already
+   decided"; the hardest dominance argument in the family.

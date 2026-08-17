@@ -1,0 +1,252 @@
+---
+title: The Python interview arsenal
+section: 0 · Foundations
+order: 2
+minutes: 25
+---
+
+# The Python interview arsenal
+
+A chef doesn't think about how to hold a knife. In an interview you have ~25
+minutes of actual coding; every second spent remembering "how do I make a
+max-heap again?" is a second not spent on the problem. This chapter is the
+knife work: what Python's core structures actually cost, the standard-library
+pieces that replace whole paragraphs of code, and the idioms that quietly turn
+O(n) into O(n²).
+
+## The big four and what they really cost
+
+| Structure | Backed by | O(1) ops | The O(n) trap |
+|---|---|---|---|
+| `list` | dynamic array | index, `append`, `pop()` from end | `insert(0,·)`, `pop(0)`, `x in list`, `remove` |
+| `dict` | open-addressed hash table | get, set, delete, `in` | worst case O(n) on pathological collisions (never in practice) |
+| `set` | hash table, keys only | add, remove, `in` | same caveat |
+| `tuple` | immutable array | index, hashable → usable as dict key | building a new one to "modify" it |
+
+Why the trap column matters: a list is a contiguous block of memory. Removing
+the front means shifting every remaining element left one slot — that's the
+whole array moving, O(n). A dict hashes the key straight to a bucket, so
+membership is O(1). This single fact — **`x in set` is O(1), `x in list` is
+O(n)** — fixes more time-limit failures than any algorithm.
+
+Two more facts interviewers probe: dicts preserve **insertion order** (Python
+3.7+, guaranteed), and dict/set inserts are **amortized** O(1) — occasionally
+the table resizes and rehashes everything, but spread over n inserts the
+average stays constant. Say "amortized" out loud; it's a senior word.
+
+Tuples earn their keep as **hashable composite keys**: `seen[(row, col)]`,
+`memo[(i, j, k)]`. Lists can't be dict keys (mutable → hash could go stale);
+tuples can.
+
+## `collections`: three imports, half your solutions
+
+```python
+from collections import deque, Counter, defaultdict
+```
+
+**`deque`** — a doubly-linked block structure: O(1) append *and* pop at
+**both** ends. It exists for exactly one interview reason: BFS queues. Using
+`list.pop(0)` in a BFS makes the traversal O(V²) all by itself.
+
+**`Counter`** — a dict subclass that counts. `Counter("banana")` →
+`{'a': 3, 'n': 2, 'b': 1}`. Missing keys read as 0 (no KeyError), counters
+subtract (`c1 - c2` drops non-positive counts), and `c.most_common(k)` gives
+the top k. Anagrams, frequency problems, "do these two strings use the same
+letters" — one line each.
+
+**`defaultdict`** — a dict that invents missing values.
+`graph = defaultdict(list)` then `graph[u].append(v)` — no "if key not in
+dict" dance. This is the standard adjacency-list builder. One trap: *reading*
+a missing key also creates it, so don't use `in` checks on a defaultdict you
+just probed casually.
+
+## `heapq`: the min-heap and its two idioms
+
+Python's heap is **min-only** — the smallest element sits at index 0.
+
+```python
+import heapq
+heapq.heapify(nums)          # O(n), in place
+heapq.heappush(h, x)         # O(log n)
+smallest = heapq.heappop(h)  # O(log n)
+```
+
+**Idiom 1 — need a max-heap? Negate.** Push `-x`, pop and negate back. There
+is no `maxheap` module; everyone does this.
+
+**Idiom 2 — need to heap by a key? Push tuples.** Heaps compare tuples
+element by element, so `(priority, item)` sorts by priority first:
+
+```python
+heapq.heappush(h, (dist, node))          # Dijkstra
+heapq.heappush(h, (-count, word))        # max by count, tie-break alphabetically
+```
+
+Trap: if priorities tie, Python compares the *second* element — and if that's
+an unorderable object (a ListNode, say), you crash. Insert a tie-breaker
+counter: `(priority, i, node)`. This exact bug bites people live in
+[Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists).
+
+Also free: `heapq.nlargest(k, xs, key=...)` and `nsmallest` — O(n log k),
+perfect for "top k" one-liners when you don't need a live heap.
+
+## `bisect`: binary search you don't have to write
+
+```python
+import bisect
+i = bisect.bisect_left(a, x)   # first index where x could go (leftmost)
+j = bisect.bisect_right(a, x)  # past the last equal element
+bisect.insort(a, x)            # insert keeping sorted — but O(n): the shift!
+```
+
+`bisect_left == bisect_right` exactly when x is absent; the difference counts
+occurrences. Since 3.10 both take `key=`. Remember `insort` is O(n) per call
+(finding the spot is log n, *inserting* shifts the array) — fine occasionally,
+wrong inside a hot loop.
+
+## `itertools`: the five worth knowing
+
+- `permutations(xs, r)` / `combinations(xs, r)` — when brute force is intended (n ≤ ~10)
+- `product(a, b)` or `product(range(m), range(n))` — clean grid iteration
+- `accumulate(xs)` — prefix sums in one call
+- `groupby(xs)` — run-length grouping, **but only on already-sorted/grouped input**
+- `chain(a, b)` — concatenate iterables without copying
+
+## Strings: the minute-savers
+
+```python
+words = s.split()            # splits on ANY whitespace runs, strips ends — usually what you want
+s = " ".join(words)          # inverse
+s.strip() / lstrip / rstrip  # trim
+c.isalnum(), c.isdigit(), c.lower()   # the palindrome/parser trio
+s.startswith(p), s.find(x)   # find returns -1, index() raises
+```
+
+The classic quadratic trap: **`s += ch` in a loop**. Strings are immutable, so
+each `+=` copies everything built so far — O(n²) total. Collect into a list
+and `''.join(parts)` once at the end: O(n).
+
+## Sorting: keys and stability
+
+```python
+xs.sort()                              # in place
+ys = sorted(xs, key=lambda p: p[1])    # new list, sort by second field
+zs = sorted(xs, key=lambda p: (-p[0], p[1]))  # desc on first, asc on second
+```
+
+Timsort is O(n log n) and **stable**: equal keys keep their original order.
+Stability is why "sort by count descending, then alphabetically" works as a
+two-key tuple — and why you can sort by a secondary key first, then the
+primary, and get a correct multi-level order.
+[Reorder Data in Log Files](/problems/0937-reorder-data-in-log-files) is
+essentially a test of whether you can write one good sort key.
+
+## Comprehensions, `enumerate`, `zip`
+
+```python
+squares = [x*x for x in xs if x > 0]
+index_of = {v: i for i, v in enumerate(xs)}     # value → index in one line
+pairs = list(zip(names, scores))                # stops at the shorter one
+for i, v in enumerate(xs): ...                  # never range(len(xs))
+```
+
+Comprehensions are modestly faster than explicit loops (the iteration happens
+in C) and read as intent, not mechanics. Use a loop when the body has real
+logic or side effects; forcing it into a comprehension is showing off, not
+clarity.
+
+## The negative modulo trap (Python vs C++/Java)
+
+Python floors toward **negative infinity**; C++/Java truncate toward zero:
+
+```python
+-7 // 2   # -4  in Python   (C++/Java: -3)
+-7 % 2    #  1  in Python   (C++/Java: -1)
+```
+
+Python's `%` always returns a result with the **sign of the divisor** — so
+`(i - 1) % n` wraps around a circular array correctly with no special-casing,
+which is genuinely nice. But if you're porting logic from C++ or an
+interviewer asks "what does -7 // 2 give," know the answer cold: Python says
+-4. When you need C-style truncation: `int(a / b)`.
+
+## Recursion depth
+
+Python's default recursion limit is ~1000 frames. A DFS on a graph or a
+skewed tree with 10⁵ nodes will hit it. Two options:
+
+```python
+import sys
+sys.setrecursionlimit(300_000)   # quick fix, say it out loud
+```
+
+or rewrite iteratively with an explicit stack — which is what you should
+*offer* in an interview: "recursion is cleaner; if depth is a concern I'll
+switch to an explicit stack." That sentence shows you know both the tool and
+its failure mode.
+
+## Debugging fast
+
+`print(f"{i=} {window=} {best=}")` — the `=` inside an f-string prints both
+the name and the value. Fastest possible trace output; delete before you
+declare done.
+
+## Muscle-memory snippets
+
+Type these until your hands know them. Every one appears in dozens of
+problems unchanged.
+
+```python
+# BFS — level by level
+from collections import deque
+def bfs(start):
+    q, seen = deque([start]), {start}
+    while q:
+        for _ in range(len(q)):        # one pass = one level
+            node = q.popleft()
+            for nxt in neighbors(node):
+                if nxt not in seen:
+                    seen.add(nxt)
+                    q.append(nxt)
+
+# DFS — iterative, explicit stack
+def dfs(start):
+    stack, seen = [start], {start}
+    while stack:
+        node = stack.pop()
+        for nxt in neighbors(node):
+            if nxt not in seen:
+                seen.add(nxt)
+                stack.append(nxt)
+
+# Binary search — lower bound (first index where check is True)
+def lower_bound(lo, hi, check):
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if check(mid):
+            hi = mid
+        else:
+            lo = mid + 1
+    return lo
+
+# Sliding window — grow right, shrink left while invalid
+def window(s):
+    best, left = 0, 0
+    state = {}                          # whatever the window tracks
+    for right, ch in enumerate(s):
+        # add s[right] to state
+        while False:                    # ← window-invalid condition
+            # remove s[left] from state
+            left += 1
+        best = max(best, right - left + 1)
+    return best
+```
+
+## Practice ladder
+
+1. [Group Anagrams](/problems/0049-group-anagrams) — `defaultdict(list)` with a tuple key; the canonical dict-of-lists pattern.
+2. [Top K Frequent Elements](/problems/0347-top-k-frequent-elements) — `Counter` plus a heap (or `nlargest`); tuple keys in action.
+3. [Top K Frequent Words](/problems/0692-top-k-frequent-words) — the `(-count, word)` tie-break idiom, exactly as taught above.
+4. [Reorder Data in Log Files](/problems/0937-reorder-data-in-log-files) — one well-designed sort key with stability doing all the work.
+5. [Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists) — heap of tuples where the tie-breaker counter saves you from a live crash.
+6. [String Compression](/problems/0443-string-compression) — string building without the O(n²) `+=` trap, under an in-place constraint.

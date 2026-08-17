@@ -1,0 +1,167 @@
+---
+title: Linked lists
+section: 1 · Data Structures
+order: 12
+minutes: 18
+---
+
+# Linked lists
+
+An array is a row of mailboxes; a linked list is a scavenger hunt. Each node
+holds a value and a clue — a pointer — to where the next node lives. Nodes can
+be scattered anywhere in memory, which is exactly the trade: you lose O(1)
+indexing (you must follow clues from the start, O(n)), but you gain O(1)
+insertion and deletion *at a node you're already holding* — just rewrite two
+clues, nothing shifts.
+
+```mermaid
+graph LR
+    H["head"] --> A["1"] --> B["2"] --> C["3"] --> N["None"]
+    style H fill:#3d3420,stroke:#f5b942
+    style N fill:#3d2022,stroke:#f4595e
+```
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+```
+
+Everything hard about linked lists is one thing: **the only way to reach a node
+is through a pointer you kept, and if you overwrite a pointer before saving
+what it pointed to, that part of the list is gone forever.** Every technique
+below is discipline for not losing pointers.
+
+## Dummy-head discipline
+
+Insertions and deletions at the head are annoying special cases: "if I'm
+deleting the first node, move `head` itself; otherwise rewrite the previous
+node's next…" The fix: prepend a throwaway **dummy node** so every real node
+has a predecessor, and return `dummy.next` at the end.
+
+```python
+dummy = ListNode(0, head)
+prev = dummy
+# ... general-case logic only, no head special-casing ...
+return dummy.next
+```
+
+Adopt this reflexively. Interviewers notice candidates who never fight
+edge cases because their setup dissolved them.
+
+## Reverse a list (iterative)
+
+The rite of passage. Walk the list flipping each arrow, carrying three
+pointers so nothing gets lost:
+
+```python
+def reverse(head):
+    prev, cur = None, head
+    while cur:
+        nxt = cur.next        # save before you overwrite!
+        cur.next = prev       # flip the arrow
+        prev, cur = nxt and prev or prev, cur  # (see below)
+        prev, cur = cur, nxt  # advance both
+    return prev               # prev is the new head
+```
+
+(The real loop body is the three clean lines: save, flip, advance.) The
+invariant: *everything before `cur` is reversed and reachable from `prev`;
+everything from `cur` on is untouched.* O(n) time, O(1) space. The recursive
+version exists but costs O(n) stack — say so if asked.
+
+## Fast & slow pointers
+
+Send two runners from the start: slow moves 1 node per step, fast moves 2.
+
+**Middle of the list:** when fast reaches the end, slow is at the middle —
+fast covered twice the distance, so slow covered half.
+
+```python
+slow = fast = head
+while fast and fast.next:
+    slow, fast = slow.next, fast.next.next
+# slow is the middle (second-middle for even length)
+```
+
+**Cycle detection (Floyd).** If there's a cycle, why must they *meet*, rather
+than leapfrog forever? Once both runners are inside the cycle, look at the gap
+from fast back to slow: each step, slow moves 1 and fast moves 2, so the gap
+shrinks by exactly 1 per step. A gap that shrinks by 1 must hit 0 — it can't
+jump over it. So they meet, in at most one lap: O(n) time, O(1) space,
+no visited-set memory. The follow-up (find the cycle's *start*): after
+meeting, put one pointer back at the head; walk both at speed 1; they meet at
+the cycle entrance — a two-line consequence of the distance algebra
+(head→entrance equals meeting-point→entrance mod cycle length).
+
+## Merge two sorted lists
+
+The zipper. Keep a `tail` on the merged list; repeatedly attach the smaller
+head:
+
+```python
+def merge(l1, l2):
+    dummy = tail = ListNode()
+    while l1 and l2:
+        if l1.val <= l2.val:
+            tail.next, l1 = l1, l1.next
+        else:
+            tail.next, l2 = l2, l2.next
+        tail = tail.next
+    tail.next = l1 or l2          # splice the leftovers — don't walk them
+    return dummy.next
+```
+
+O(n + m), O(1) extra space — we rewire, never copy. And it scales up:
+[Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists) keeps the k
+current heads in a min-heap, popping the global smallest each time —
+O(N log k) for N total nodes. (Ties break via a `(val, i, node)` tuple, since
+nodes don't compare.) Pairwise merging achieves the same bound; naive
+one-by-one merging is O(N·k) — a favorite "why is yours better?" probe.
+
+## The map + DLL fusion: LRU cache
+
+[LRU Cache](/problems/0146-lru-cache) is the linked list's star turn, and the
+canonical "combine two structures" design. Requirements: O(1) `get`, O(1)
+`put`, evict the least-recently-used on overflow. Each structure alone fails —
+a map has no ordering; a list has no O(1) lookup. Fuse them:
+
+- **Hash map**: key → node, for O(1) *finding*.
+- **Doubly linked list**: nodes in recency order, for O(1) *moving and
+  evicting* — unlink a node by rewiring its two neighbors, no search.
+
+Every `get`/`put` looks the node up in the map, unlinks it, and re-links it at
+the "most recent" end; eviction pops the "least recent" end. Two sentinel
+nodes (dummy head *and* tail) kill every edge case. In real Python you'd say
+`OrderedDict` does exactly this internally — mention it, then build it by hand
+anyway, because building it is the interview.
+
+## Traps
+
+- Losing the rest of the list by assigning `next` before saving it. Save
+  first, always.
+- `while fast and fast.next:` — the guard order matters; `fast.next` on a
+  `None` fast is the classic crash.
+- Even-length middles: fast/slow lands on the *second* middle; some problems
+  (palindrome check, sort split) want the first — adjust with
+  `while fast.next and fast.next.next`.
+- Forgetting that deleting a node needs its *predecessor* in a singly linked
+  list — which is the entire reason LRU uses a *doubly* linked one.
+
+## What the interviewer asks next
+
+*"Why do they have to meet?"* (gap shrinks by exactly 1). *"Reverse in O(1)
+space recursively?"* (no — recursion is O(n) stack; iterative is the answer).
+*"Why a doubly linked list in LRU?"* (O(1) unlink needs the predecessor).
+*"Merge k: why log k and not log N?"* (the heap never holds more than k
+nodes).
+
+## Practice ladder
+
+1. [Merge k Sorted Lists](/problems/0023-merge-k-sorted-lists) — pairwise
+   merge and the heap version; own the O(N log k) argument.
+2. [LRU Cache](/problems/0146-lru-cache) — the map + DLL fusion, sentinels and
+   all; a genuine Google favorite.
+3. [Moving Average from Data Stream](/problems/0346-moving-average-from-data-stream)
+   — deque-backed streaming; light, but reps the pointer-window mindset.

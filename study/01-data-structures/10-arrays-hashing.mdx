@@ -1,0 +1,178 @@
+---
+title: Arrays & hashing
+section: 1 · Data Structures
+order: 10
+minutes: 25
+---
+
+# Arrays & hashing
+
+An array is a row of numbered mailboxes. Because the boxes sit side by side and
+are all the same size, the postman doesn't *search* for box 500 — he computes
+its address: `start + 500 × box_size`, one multiplication, done. That address
+arithmetic is why `xs[i]` is O(1), and it's the single fact everything in this
+chapter grows out of.
+
+## Dynamic arrays (Python's `list`)
+
+A Python `list` is an array that pretends to be stretchy. Underneath, it
+allocates more boxes than it needs; `append` drops a value into a spare box in
+O(1). When the spares run out, it allocates a bigger block (roughly ×1.125 in
+CPython, ×2 in most textbooks) and copies everything over — a rare O(n) event.
+Spread the copies over n appends and the total work is still O(n), so append is
+**amortized O(1)**. The costs you must respect:
+
+| Operation | Cost | Why |
+|---|---|---|
+| `xs[i]`, `xs[i] = v` | O(1) | address arithmetic |
+| `append`, `pop()` from end | amortized O(1) | spare capacity |
+| `insert(0, v)`, `pop(0)` | O(n) | everything shifts one box |
+| `v in xs` | O(n) | scan every box |
+| slice `xs[a:b]` | O(b−a) | copies |
+
+`v in xs` being O(n) is the trap. The fix is the rest of this chapter.
+
+## Hashing from first principles
+
+Suppose you run a coat check with 100 hooks. Instead of remembering where each
+coat went, you make a rule: take the ticket number, keep the last two digits,
+hang the coat on that hook. Retrieval is instant — recompute the rule, walk to
+the hook.
+
+That rule is a **hash function**: any key (string, tuple, number) → a fixed
+integer. The hooks are **buckets** in an internal array; the bucket index is
+`hash(key) % num_buckets`. So a hash map is really just an array wearing a
+disguise — it converts "find my key" into "compute an index", inheriting the
+array's O(1) access.
+
+Two tickets can end in the same digits — a **collision**. The table handles it
+by keeping more than one coat per hook (chaining) or probing nearby hooks
+(open addressing — CPython does this). Either way, a lookup might have to check
+a few candidates. Why is it still O(1) *on average*? Because the table watches
+its **load factor** (items ÷ buckets) and, when hooks get crowded (CPython
+resizes at 2/3 full), it grows the bucket array and rehashes. That keeps the
+expected number of coats per hook constant. The honest sentence for an
+interviewer:
+
+> "Hash map operations are O(1) average and amortized — a single lookup can
+> degrade under collisions, and inserts occasionally trigger a resize, but
+> per-operation the expected cost is constant."
+
+One consequence worth saying out loud: keys must be **hashable**, i.e.
+immutable — strings, numbers, tuples of hashables. A `list` can't be a key;
+convert it to a `tuple` first. That fact becomes a technique below.
+
+## Map vs set: which one do you reach for?
+
+- **Set** answers *"have I seen this?"* — membership only.
+- **Map (dict)** answers *"what do I know about this?"* — membership plus a
+  payload: a count, an index, a list of group members.
+
+If you find yourself doing `d[key] = True`, you wanted a set.
+
+## The three moves that solve half of all easy/medium problems
+
+**1. Frequency counting.** Tally occurrences in one pass:
+
+```python
+from collections import Counter, defaultdict
+
+freq = Counter(words)          # word -> count, O(n)
+# or by hand:
+freq = defaultdict(int)
+for w in words:
+    freq[w] += 1
+```
+
+Anagram checks, top-k-frequent, "first unique character" — all start here.
+
+**2. Seen-set dedup.** One pass, one set, O(n) instead of O(n²):
+
+```python
+seen = set()
+for x in xs:
+    if x in seen:
+        return True        # duplicate found
+    seen.add(x)
+```
+
+The pattern generalizes: Two Sum is a seen-*map* — for each `x`, ask "did I
+already see `target − x`?", storing value → index as you go.
+
+**3. Key design.** This is the senior move. A hash map groups things that share
+a key — so if you can *invent a key* that captures "these belong together", the
+map does the grouping for free. [Group Anagrams](/problems/0049-group-anagrams):
+anagrams become identical when sorted, so the sorted string *is* the group key.
+
+```python
+def group_anagrams(strs):
+    groups = defaultdict(list)
+    for s in strs:
+        groups[tuple(sorted(s))].append(s)   # sorted-tuple key
+    return list(groups.values())
+```
+
+That's O(n·k log k) for n strings of length k. The follow-up an interviewer
+asks: *can you drop the sort?* Yes — use a **count signature**: a 26-slot tuple
+of letter counts as the key, O(n·k). Two different key designs, same map
+machinery. When you hear "group by ___", your first question should be "what's
+the canonical key?"
+
+## Prefix sums + hash map: counting subarrays in O(n)
+
+The combo pattern that separates "knows dicts" from "thinks in dicts". Define
+`prefix[i]` = sum of the first i elements. Then any subarray sum is a
+difference: `sum(i..j) = prefix[j+1] − prefix[i]`. So "how many subarrays sum
+to k?" becomes "for each prefix `p`, how many *earlier* prefixes equal
+`p − k`?" — a seen-map question:
+
+```python
+def count_subarrays_sum_k(nums, k):
+    count, prefix = 0, 0
+    seen = defaultdict(int)
+    seen[0] = 1                    # empty prefix: subarrays starting at index 0
+    for x in nums:
+        prefix += x
+        count += seen[prefix - k]  # each earlier match ends a valid subarray here
+        seen[prefix] += 1
+    return count
+```
+
+One pass, O(n) time, O(n) space. The `seen[0] = 1` line is where everyone slips
+— without it you miss subarrays that start at the very beginning. Note this
+handles negative numbers, which sliding window cannot; that contrast is a
+classic follow-up.
+
+## Traps
+
+- **Mutating while iterating.** Don't add/remove dict keys inside
+  `for k in d:` — Python raises. Iterate over `list(d)` or collect changes.
+- **`dict.get` vs `[]`.** `d[k]` on a missing key throws; `d.get(k, default)`
+  or `defaultdict` doesn't. Pick one deliberately.
+- **Worst case is real.** Adversarial inputs can force O(n) per lookup. If an
+  interviewer pushes, mention it and note that guaranteed bounds come from
+  balanced trees (O(log n)) — then say why average O(1) is the right default.
+- **Floating-point keys.** `0.1 + 0.2 != 0.3`; never hash on computed floats —
+  hash on integer or rational representations.
+
+## What the interviewer asks next
+
+*"What happens inside the dict when it gets full?"* (resize + rehash, amortized
+O(1)). *"Why can't a list be a key?"* (mutable → hash could change → the coat
+would be lost on the wrong hook). *"Can you do Group Anagrams without
+sorting?"* (count signature). *"Does your subarray solution handle negatives?"*
+(yes — and that's exactly why it's prefix-map, not sliding window).
+
+## Practice ladder
+
+1. [Most Common Word](/problems/0819-most-common-word) — frequency counting
+   plus string cleanup; the warm-up rep for Counter fluency.
+2. [Group Anagrams](/problems/0049-group-anagrams) — key design: sorted-tuple
+   vs count-signature keys.
+3. [Top K Frequent Elements](/problems/0347-top-k-frequent-elements) — count
+   with a map, then select; sets up the heap chapter.
+4. [Insert Delete GetRandom O(1)](/problems/0380-insert-delete-getrandom) —
+   fuse a map with an array (swap-with-last delete); the classic "combine two
+   structures" design question.
+5. [Logger Rate Limiter](/problems/0359-logger-rate-limiter) — map as
+   timestamp memory; a taste of design-flavored hashing.
