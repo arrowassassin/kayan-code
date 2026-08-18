@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-Two independent requirements on one substring — "only characters from this alphabet" and "all five distinct characters present" — is the classic **character-class analysis** setup (this is the duplicate/character-analysis question named in the Snowflake prep guide). The first requirement is a *segmentation* condition: a consonant anywhere kills the substring, so consonants chop the string into isolated vowel runs. The second is a *coverage* condition inside each run, and "count substrings whose window covers all required characters" is the same shape as Minimum Window Substring — solved by tracking per-character bookkeeping while sweeping an endpoint.
+Two independent requirements on one substring — "only characters from this alphabet" and "all five distinct characters present" — is the classic **character-class analysis** setup (the canonical duplicate/character-analysis interview question). The first requirement is a *segmentation* condition: a consonant anywhere kills the substring, so consonants chop the string into isolated vowel runs. The second is a *coverage* condition inside each run, and "count substrings whose window covers all required characters" is the same shape as Minimum Window Substring — solved by tracking per-character bookkeeping while sweeping an endpoint.
 
 The interview habit worth practicing here: read the spec out loud and enumerate the token classes before coding. There are exactly two — vowels (five kinds, each individually tracked) and consonants (all equivalent: every one is a wall). That enumeration *is* the algorithm design.
 

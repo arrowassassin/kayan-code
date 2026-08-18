@@ -2,8 +2,10 @@
   "id": 62,
   "title": "Unique Paths",
   "difficulty": "Medium",
-  "topics": ["Dynamic Programming"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Dynamic Programming"
+  ],
+  "priority": 2,
   "follow_up": "1143-longest-common-subsequence",
   "judge": {
     "mode": "function",

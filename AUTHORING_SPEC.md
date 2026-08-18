@@ -34,7 +34,7 @@ interview clarify gate).
   "title": "Rotting Oranges",
   "difficulty": "Medium",            // Easy | Medium | Hard
   "topics": ["Graph BFS/DFS"],       // EXACT canonical topic names, usually 1
-  "snowflake_priority": 2,           // 1 = ★ Snowflake-reported/named, 2 = prep-PDF topic, 3 = pattern support
+  "priority": 2,                     // 1 = ★ frequently-reported/named, 2 = core-topic, 3 = pattern support
   "follow_up": "<slug>",             // optional: harder linked extension
   "follow_up_of": "<slug>",          // optional: the warmup this extends
   "judge": { ... }                   // see below

@@ -2,8 +2,10 @@
   "id": 410,
   "title": "Split Array Largest Sum",
   "difficulty": "Hard",
-  "topics": ["Binary Search"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Binary Search"
+  ],
+  "priority": 2,
   "follow_up_of": "1011-capacity-to-ship-packages",
   "judge": {
     "mode": "function",

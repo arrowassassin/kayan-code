@@ -2,8 +2,10 @@
   "id": 875,
   "title": "Koko Eating Bananas",
   "difficulty": "Medium",
-  "topics": ["Binary Search"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Binary Search"
+  ],
+  "priority": 2,
   "follow_up": "1011-capacity-to-ship-packages",
   "judge": {
     "mode": "function",

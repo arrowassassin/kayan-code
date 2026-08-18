@@ -1,0 +1,1 @@
+import"./rolldown-runtime-hePW80VL.js";import{Xt as e}from"./charts-C-mlvrj8.js";import{u as t}from"./codemirror-CaFEBKhr.js";import{m as n}from"./index-CxK8Yo2J.js";e();var r=t();function i({className:e,...t}){return(0,r.jsx)(`div`,{className:n(`rounded-xl border border-line bg-panel p-[18px]`,e),...t})}export{i as t};

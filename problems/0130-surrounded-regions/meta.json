@@ -2,8 +2,10 @@
   "id": 130,
   "title": "Surrounded Regions",
   "difficulty": "Medium",
-  "topics": ["Graph BFS/DFS"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Graph BFS/DFS"
+  ],
+  "priority": 2,
   "follow_up": "0417-pacific-atlantic-water-flow",
   "judge": {
     "mode": "function",

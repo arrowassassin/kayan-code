@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"**Shortest** contiguous substring **covering** a requirement" — two signals, one conclusion. Contiguous + linear input says two pointers over `s`; and the coverage property is *monotone under growing*: if a window covers `t`, every window containing it also covers `t`. Monotone properties are exactly what sliding windows exploit. This is a ★ Snowflake-named problem and the capstone of the window family: it takes the skeleton from Longest Substring Without Repeating Characters (its linked warmup) and flips it — there the window property was "good until broken" and you maximized; here it's "bad until satisfied" and you minimize, harvesting *during the shrink phase* instead of the expand phase.
+"**Shortest** contiguous substring **covering** a requirement" — two signals, one conclusion. Contiguous + linear input says two pointers over `s`; and the coverage property is *monotone under growing*: if a window covers `t`, every window containing it also covers `t`. Monotone properties are exactly what sliding windows exploit. This is a ★ top-priority problem and the capstone of the window family: it takes the skeleton from Longest Substring Without Repeating Characters (its linked warmup) and flips it — there the window property was "good until broken" and you maximized; here it's "bad until satisfied" and you minimize, harvesting *during the shrink phase* instead of the expand phase.
 
 ## 2. Brute force first
 

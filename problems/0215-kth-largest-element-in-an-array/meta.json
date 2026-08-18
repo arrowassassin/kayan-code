@@ -2,8 +2,10 @@
   "id": 215,
   "title": "Kth Largest Element in an Array",
   "difficulty": "Medium",
-  "topics": ["Top-K / Heap"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Top-K / Heap"
+  ],
+  "priority": 2,
   "follow_up": "0347-top-k-frequent-elements",
   "judge": {
     "mode": "function",

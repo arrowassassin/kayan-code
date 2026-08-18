@@ -178,7 +178,7 @@ def list_problems():
             "title": meta.get("title"),
             "difficulty": meta.get("difficulty"),
             "topics": meta.get("topics", []),
-            "snowflake_priority": meta.get("snowflake_priority", 3),
+            "priority": meta.get("priority", 3),
             "follow_up_of": meta.get("follow_up_of"),
             "follow_up": meta.get("follow_up"),
             "solved": bool(s and s["solved"]),
@@ -188,7 +188,7 @@ def list_problems():
             "solve_seconds": s["solve_seconds"] if s else None,
             "due_for_review": slug in due,
         })
-    out.sort(key=lambda p: (p["snowflake_priority"], p["id"] or 0))
+    out.sort(key=lambda p: (p["priority"], p["id"] or 0))
     return out
 
 
@@ -408,7 +408,7 @@ def pick_mock_pair(bank, explicit_slug=None):
     seed = uuid.uuid4().int
     weights = []
     for slug, fu in pairs:
-        w = {1: 9, 2: 4, 3: 1}.get(bank[slug].get("snowflake_priority", 3), 1)
+        w = {1: 9, 2: 4, 3: 1}.get(bank[slug].get("priority", 3), 1)
         if slug not in solved:
             w *= 3
         weights.append(w)
@@ -707,7 +707,7 @@ def daily_challenge():
     # deterministic per-day pick, weighted toward priority 1-2
     weighted = []
     for s in slugs:
-        w = {1: 4, 2: 2, 3: 1}.get(bank[s].get("snowflake_priority", 3), 1)
+        w = {1: 4, 2: 2, 3: 1}.get(bank[s].get("priority", 3), 1)
         weighted += [s] * w
     h = int(hashlib.sha256(today.encode()).hexdigest(), 16)
     slug = weighted[h % len(weighted)]

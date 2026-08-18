@@ -84,7 +84,7 @@ export function ProblemsPage() {
       if (status === 'Solved' && !p.solved) return false
       if (status === 'Unsolved' && p.solved) return false
       if (status === 'Due' && !p.due_for_review) return false
-      if (prioOnly && p.snowflake_priority !== 1) return false
+      if (prioOnly && p.priority !== 1) return false
       return true
     })
     const val = (p: ProblemSummary): number | string => {
@@ -100,7 +100,7 @@ export function ProblemsPage() {
         case 'time':
           return p.solve_seconds ?? Number.MAX_SAFE_INTEGER
         default:
-          return p.snowflake_priority * 1e7 + (p.id ?? 0)
+          return p.priority * 1e7 + (p.id ?? 0)
       }
     }
     return rows.sort((a, b) => {
@@ -150,7 +150,7 @@ export function ProblemsPage() {
         ))}
         <span className="mx-1 h-5 w-px bg-line" />
         <Chip on={prioOnly} onClick={() => setPrioOnly(!prioOnly)}>
-          ★ Snowflake-reported
+          ★ Top priority
         </Chip>
       </div>
       <div className="mb-4 flex flex-wrap gap-2">
@@ -298,9 +298,9 @@ function Row({ p, onClick }: { p: ProblemSummary; onClick: () => void }) {
         {p.last_submitted_at ? timeAgo(p.last_submitted_at) : '—'}
       </td>
       <td className="px-3 py-2.5 text-right">
-        {p.snowflake_priority === 1 ? (
+        {p.priority === 1 ? (
           <Star size={15} className="ml-auto fill-medium text-medium" />
-        ) : p.snowflake_priority === 2 ? (
+        ) : p.priority === 2 ? (
           <Star size={15} className="ml-auto text-ink-dim" />
         ) : null}
       </td>

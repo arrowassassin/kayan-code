@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-The statement hands you **sorted, non-overlapping** intervals and asks you to keep that invariant after one change. Whenever an input arrives pre-sorted, the intended solution almost always exploits that order in a **single linear pass** — reaching for "sort then merge" (the generic Merge Intervals recipe) throws the gift away. This is a Snowflake-reported question, and the trap it sets is exactly that: candidates who memorized Merge Intervals re-sort an already-sorted input.
+The statement hands you **sorted, non-overlapping** intervals and asks you to keep that invariant after one change. Whenever an input arrives pre-sorted, the intended solution almost always exploits that order in a **single linear pass** — reaching for "sort then merge" (the generic Merge Intervals recipe) throws the gift away. This is a frequently-reported interview question, and the trap it sets is exactly that: candidates who memorized Merge Intervals re-sort an already-sorted input.
 
 ## 2. Brute force first
 

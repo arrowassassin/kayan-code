@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Flame, Snowflake } from 'lucide-react'
+import { Code2, Flame } from 'lucide-react'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -12,7 +12,7 @@ export function Shell() {
     <div className="flex h-full flex-col">
       <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center gap-7 border-b border-line bg-bg/80 px-5 backdrop-blur-md">
         <Link to="/" className="flex items-center gap-1 text-[19px] font-bold tracking-tight">
-          <Snowflake size={20} className="text-accent" />
+          <Code2 size={20} className="text-accent" />
           <span>
             Kayan<span className="grad-text">Code</span>
           </span>

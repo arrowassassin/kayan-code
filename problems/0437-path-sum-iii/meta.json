@@ -2,13 +2,18 @@
   "id": 437,
   "title": "Path Sum III",
   "difficulty": "Medium",
-  "topics": ["Trees"],
-  "snowflake_priority": 3,
+  "topics": [
+    "Trees"
+  ],
+  "priority": 3,
   "follow_up_of": "0543-diameter-of-binary-tree",
   "judge": {
     "mode": "function",
     "entry": "pathSum",
     "compare": "exact",
-    "arg_types": ["tree", "raw"]
+    "arg_types": [
+      "tree",
+      "raw"
+    ]
   }
 }

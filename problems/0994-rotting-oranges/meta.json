@@ -2,8 +2,10 @@
   "id": 994,
   "title": "Rotting Oranges",
   "difficulty": "Medium",
-  "topics": ["Graph BFS/DFS"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Graph BFS/DFS"
+  ],
+  "priority": 2,
   "follow_up_of": "0200-number-of-islands",
   "judge": {
     "mode": "function",

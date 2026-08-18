@@ -2,13 +2,17 @@
   "id": 987,
   "title": "Vertical Order Traversal of a Binary Tree",
   "difficulty": "Hard",
-  "topics": ["Trees"],
-  "snowflake_priority": 3,
+  "topics": [
+    "Trees"
+  ],
+  "priority": 3,
   "follow_up_of": "0199-binary-tree-right-side-view",
   "judge": {
     "mode": "function",
     "entry": "verticalTraversal",
     "compare": "exact",
-    "arg_types": ["tree"]
+    "arg_types": [
+      "tree"
+    ]
   }
 }

@@ -2,8 +2,10 @@
   "id": 295,
   "title": "Find Median from Data Stream",
   "difficulty": "Hard",
-  "topics": ["Top-K / Heap"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Top-K / Heap"
+  ],
+  "priority": 2,
   "follow_up_of": "0023-merge-k-sorted-lists",
   "judge": {
     "mode": "methods",

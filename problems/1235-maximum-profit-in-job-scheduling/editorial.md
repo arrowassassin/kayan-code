@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-★ Snowflake-reported. "Pick non-conflicting weighted things to maximize a total" is **weighted interval scheduling** — and the fastest way to recognize it is to see House Robber (198, this problem's warmup) hiding inside. In House Robber the "jobs" are houses: house `i` occupies the slot `[i, i+2)` of the street, all slots have identical shape, and "the latest compatible choice" is always mechanically `i − 2`. Here the intervals have arbitrary lengths and positions, so "the latest compatible job" must be *computed* — but the take-or-skip decision is unchanged. Two red flags rule out greedy: profits are weighted (the classic *unweighted* "activity selection" greedy — most jobs by earliest end — cheerfully picks two 20s over one 100), and `n = 5 × 10^4` with times up to 10^9 says "sort + binary search," not "make time an array index."
+★ A frequently-reported senior-interview question. "Pick non-conflicting weighted things to maximize a total" is **weighted interval scheduling** — and the fastest way to recognize it is to see House Robber (198, this problem's warmup) hiding inside. In House Robber the "jobs" are houses: house `i` occupies the slot `[i, i+2)` of the street, all slots have identical shape, and "the latest compatible choice" is always mechanically `i − 2`. Here the intervals have arbitrary lengths and positions, so "the latest compatible job" must be *computed* — but the take-or-skip decision is unchanged. Two red flags rule out greedy: profits are weighted (the classic *unweighted* "activity selection" greedy — most jobs by earliest end — cheerfully picks two 20s over one 100), and `n = 5 × 10^4` with times up to 10^9 says "sort + binary search," not "make time an array index."
 
 ## 2. Brute force first
 

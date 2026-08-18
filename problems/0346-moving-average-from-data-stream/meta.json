@@ -2,8 +2,10 @@
   "id": 346,
   "title": "Moving Average from Data Stream",
   "difficulty": "Easy",
-  "topics": ["Stream / Design"],
-  "snowflake_priority": 1,
+  "topics": [
+    "Stream / Design"
+  ],
+  "priority": 1,
   "follow_up": "0362-design-hit-counter",
   "judge": {
     "mode": "methods",

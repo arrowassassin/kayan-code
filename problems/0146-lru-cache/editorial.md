@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Design a class", "O(1) per operation", "evict by recency" — this is the **composite data structure** design pattern: no single structure meets all the requirements, so you glue two together and keep them in sync. The Snowflake angle: their reported "stream-processing class design" questions are exactly this family — state machines with strict per-op complexity budgets.
+"Design a class", "O(1) per operation", "evict by recency" — this is the **composite data structure** design pattern: no single structure meets all the requirements, so you glue two together and keep them in sync. The senior-interview angle: reported "stream-processing class design" questions are exactly this family — state machines with strict per-op complexity budgets.
 
 ## 2. Brute force first
 

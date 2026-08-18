@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-The words "combine overlapping intervals" name the foundational Intervals pattern outright. The load-bearing detail is what the statement does **not** promise: the input is unsorted. That single fact dictates the whole plan — almost every interval problem becomes a linear scan *after* you impose an order, so the first decision to say out loud is "I'll sort, and here's the key I'll sort by." This is the warmup for the whole Snowflake intervals chain (Insert Interval, Employee Free Time), and interviewers use it to check whether you can justify a sort key rather than recite one.
+The words "combine overlapping intervals" name the foundational Intervals pattern outright. The load-bearing detail is what the statement does **not** promise: the input is unsorted. That single fact dictates the whole plan — almost every interval problem becomes a linear scan *after* you impose an order, so the first decision to say out loud is "I'll sort, and here's the key I'll sort by." This is the warmup for the whole intervals chain (Insert Interval, Employee Free Time), and interviewers use it to check whether you can justify a sort key rather than recite one.
 
 ## 2. Brute force first
 

@@ -2,8 +2,10 @@
   "id": 359,
   "title": "Logger Rate Limiter",
   "difficulty": "Easy",
-  "topics": ["Stream / Design"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Stream / Design"
+  ],
+  "priority": 2,
   "follow_up": "0703-kth-largest-element-in-a-stream",
   "judge": {
     "mode": "methods",

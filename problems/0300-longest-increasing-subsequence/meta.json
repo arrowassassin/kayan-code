@@ -2,8 +2,10 @@
   "id": 300,
   "title": "Longest Increasing Subsequence",
   "difficulty": "Medium",
-  "topics": ["Dynamic Programming"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Dynamic Programming"
+  ],
+  "priority": 2,
   "judge": {
     "mode": "function",
     "entry": "lengthOfLIS",

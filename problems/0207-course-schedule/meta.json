@@ -2,8 +2,10 @@
   "id": 207,
   "title": "Course Schedule",
   "difficulty": "Medium",
-  "topics": ["Graph BFS/DFS"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Graph BFS/DFS"
+  ],
+  "priority": 2,
   "follow_up": "0210-course-schedule-ii",
   "judge": {
     "mode": "function",

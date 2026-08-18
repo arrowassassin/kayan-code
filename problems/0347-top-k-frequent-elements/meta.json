@@ -2,8 +2,10 @@
   "id": 347,
   "title": "Top K Frequent Elements",
   "difficulty": "Medium",
-  "topics": ["Top-K / Heap"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Top-K / Heap"
+  ],
+  "priority": 2,
   "follow_up_of": "0215-kth-largest-element-in-an-array",
   "follow_up": "0692-top-k-frequent-words",
   "judge": {

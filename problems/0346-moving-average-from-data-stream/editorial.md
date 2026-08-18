@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Values arrive one at a time", "last `size` values", "O(1) per call, O(size) state" — this is the entry point of the **stream-processing class design** family (the Snowflake-reported pattern). The tell is the pair of budgets stated up front: a *per-operation* time budget and a *bounded-state* budget against an *unbounded* input. Every design in this family is judged the same way: name the per-op cost of each method before you write it, then make the data structure enforce it.
+"Values arrive one at a time", "last `size` values", "O(1) per call, O(size) state" — this is the entry point of the **stream-processing class design** family (a frequently-reported senior-interview pattern). The tell is the pair of budgets stated up front: a *per-operation* time budget and a *bounded-state* budget against an *unbounded* input. Every design in this family is judged the same way: name the per-op cost of each method before you write it, then make the data structure enforce it.
 
 ## 2. Brute force first
 

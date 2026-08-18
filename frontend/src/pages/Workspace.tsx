@@ -240,8 +240,8 @@ export function Workspace({
                 {problem.id}. {problem.title}
               </h1>
               <DifficultyBadge difficulty={problem.difficulty} />
-              {problem.snowflake_priority === 1 && (
-                <Badge variant="priority">★ Snowflake</Badge>
+              {problem.priority === 1 && (
+                <Badge variant="priority">★ Top priority</Badge>
               )}
               {problem.topics.map((t) => (
                 <Badge key={t}>{t}</Badge>

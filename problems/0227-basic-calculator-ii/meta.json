@@ -2,8 +2,10 @@
   "id": 227,
   "title": "Basic Calculator II",
   "difficulty": "Medium",
-  "topics": ["String Parsing"],
-  "snowflake_priority": 2,
+  "topics": [
+    "String Parsing"
+  ],
+  "priority": 2,
   "follow_up_of": "0394-decode-string",
   "judge": {
     "mode": "function",

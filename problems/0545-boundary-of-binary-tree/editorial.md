@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-The statement itself is a specification in four numbered pieces: root, left edge, leaves, right edge reversed. That's the signal. This is not a "find the clever traversal" problem — it's a **decomposition** problem. Trying to produce the boundary in one traversal (tracking "am I currently on the boundary?" flags through a single DFS) is exactly how candidates drown: the flag logic has four interacting states and the leaf/edge overlap cases turn into whack-a-mole. This is a ★ Snowflake-named question, and what it really tests is whether you can turn a fussy spec into three tiny, boring passes — plus whether you nail the ownership rules that prevent duplicates.
+The statement itself is a specification in four numbered pieces: root, left edge, leaves, right edge reversed. That's the signal. This is not a "find the clever traversal" problem — it's a **decomposition** problem. Trying to produce the boundary in one traversal (tracking "am I currently on the boundary?" flags through a single DFS) is exactly how candidates drown: the flag logic has four interacting states and the leaf/edge overlap cases turn into whack-a-mole. This is a ★ top-priority question, and what it really tests is whether you can turn a fussy spec into three tiny, boring passes — plus whether you nail the ownership rules that prevent duplicates.
 
 ## 2. Brute force first
 

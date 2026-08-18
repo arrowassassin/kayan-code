@@ -127,7 +127,7 @@ def _chat(messages, temperature, response_format=None):
 def build_review_prompt(statement, code, judge_result, mock_context=None):
     parts = [
         "You are a rigorous coding-interview coach reviewing a candidate's "
-        "submission for a Snowflake-style 60-minute live coding round "
+        "submission for a senior-level 60-minute live coding round "
         "(Python, communication scored). Respond with the requested JSON "
         "object only.",
         "## Problem\n" + statement,

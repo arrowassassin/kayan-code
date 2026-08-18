@@ -2,14 +2,18 @@
   "id": 23,
   "title": "Merge K Sorted Lists",
   "difficulty": "Hard",
-  "topics": ["Top-K / Heap"],
-  "snowflake_priority": 2,
+  "topics": [
+    "Top-K / Heap"
+  ],
+  "priority": 2,
   "follow_up": "0295-find-median-from-data-stream",
   "judge": {
     "mode": "function",
     "entry": "mergeKLists",
     "compare": "exact",
-    "arg_types": ["listnode[]"],
+    "arg_types": [
+      "listnode[]"
+    ],
     "ret_type": "listnode"
   }
 }

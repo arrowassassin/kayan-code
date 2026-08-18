@@ -53,7 +53,7 @@ Rules:
   candidate reports vary, say so plainly ("teams differ; expect X or Y").
   Never invent specific insider numbers.
 
-The reader's context: Snowflake Applied AI round 2 next, AND a Google Senior
+The reader's context: senior coding rounds at top companies, including a Google Senior
 SDE (L5) loop — the curriculum serves both; Google-specific chapters carry
 the L5 senior bar (ambiguity handling, follow-up escalation, code quality,
 communication) explicitly.

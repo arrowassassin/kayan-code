@@ -8,7 +8,7 @@ export interface ProblemSummary {
   title: string
   difficulty: 'Easy' | 'Medium' | 'Hard'
   topics: string[]
-  snowflake_priority: 1 | 2 | 3
+  priority: 1 | 2 | 3
   follow_up_of?: string | null
   follow_up?: string | null
   solved: boolean

@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Partition items into equivalence classes" is the **canonical-key hashing** pattern: don't compare items to each other, compare each item to a normal form. The equivalence here — same letters, any order — is the character-multiset relation, so the normal form must erase order while preserving multiplicity. The Snowflake prep guide's "duplicate/character analysis" family lives exactly here: the interview skill being probed is *choosing the canonicalization*, and saying clearly why it's sound (equal keys ⇔ anagrams, both directions).
+"Partition items into equivalence classes" is the **canonical-key hashing** pattern: don't compare items to each other, compare each item to a normal form. The equivalence here — same letters, any order — is the character-multiset relation, so the normal form must erase order while preserving multiplicity. The classic interview "duplicate/character analysis" family lives exactly here: the interview skill being probed is *choosing the canonicalization*, and saying clearly why it's sound (equal keys ⇔ anagrams, both directions).
 
 ## 2. Brute force first
 

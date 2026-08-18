@@ -2,12 +2,16 @@
   "id": 545,
   "title": "Boundary of Binary Tree",
   "difficulty": "Medium",
-  "topics": ["Trees"],
-  "snowflake_priority": 1,
+  "topics": [
+    "Trees"
+  ],
+  "priority": 1,
   "judge": {
     "mode": "function",
     "entry": "boundaryOfBinaryTree",
     "compare": "exact",
-    "arg_types": ["tree"]
+    "arg_types": [
+      "tree"
+    ]
   }
 }

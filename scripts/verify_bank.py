@@ -28,7 +28,7 @@ from judge import runner  # noqa: E402
 PROBLEMS = os.path.join(ROOT, "problems")
 REQUIRED_FILES = ["problem.md", "meta.json", "starter.py", "tests.json",
                   "hints.md", "editorial.md", "solution.py"]
-REQUIRED_META = ["id", "title", "difficulty", "topics", "snowflake_priority", "judge"]
+REQUIRED_META = ["id", "title", "difficulty", "topics", "priority", "judge"]
 EDITORIAL_MARKERS = [
     "Pattern recognition",
     "Brute force",
@@ -61,8 +61,8 @@ def check_problem(slug, all_slugs):
             errors.append(f"meta.json missing field: {k}")
     if meta.get("difficulty") not in DIFFICULTIES:
         errors.append(f"bad difficulty: {meta.get('difficulty')}")
-    if meta.get("snowflake_priority") not in (1, 2, 3):
-        errors.append("snowflake_priority must be 1, 2 or 3")
+    if meta.get("priority") not in (1, 2, 3):
+        errors.append("priority must be 1, 2 or 3")
     judge_cfg = meta.get("judge", {})
     if judge_cfg.get("mode") not in ("function", "methods"):
         errors.append("judge.mode must be 'function' or 'methods'")

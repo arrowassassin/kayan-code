@@ -60,7 +60,7 @@ function StartScreen({ onStart, starting }: { onStart: () => void; starting: boo
         Mock <span className="grad-text">Interview</span>
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-ink-dim">
-        A faithful rehearsal of Snowflake's 60-minute coding round: warmup +
+        A faithful rehearsal of a senior 60-minute coding round: warmup +
         hidden harder follow-up, communication gates, no editor assists, AI
         debrief only after the clock stops.
       </p>

@@ -2,8 +2,10 @@
   "id": 65,
   "title": "Valid Number",
   "difficulty": "Hard",
-  "topics": ["String Parsing"],
-  "snowflake_priority": 2,
+  "topics": [
+    "String Parsing"
+  ],
+  "priority": 2,
   "judge": {
     "mode": "function",
     "entry": "isNumber",

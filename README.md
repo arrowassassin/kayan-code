@@ -1,9 +1,10 @@
 # KayanCode ❄
 
 A complete, local LeetCode-style practice platform purpose-built for
-**Snowflake's Applied AI Engineer Round 2 "Coding Fundamentals"** (60-min live
-coding · Python · no AI assistants · warmup + harder follow-up · communication
-scored). Fully offline, single user, no accounts.
+**senior software-engineering interview loops** (60-min live coding · Python ·
+no AI assistants · warmup + harder follow-up · communication scored), with a
+full study curriculum covering coding, system design, and behavioral rounds.
+Fully offline, single user, no accounts.
 
 ## Quick start
 
@@ -17,7 +18,7 @@ That's it — the built React UI ships in `frontend/dist`. Optional: create
 
 ## What's inside
 
-- **~79-problem bank** across the Snowflake-weighted topics (graphs, trees,
+- **~89-problem bank** across the interview-weighted topics (graphs, trees,
   string parsing, heap/top-K, sliding window, two pointer, DP, intervals,
   stream/design), each with an original statement, starter stub, visible +
   hidden test suites, 3 progressive hints, and a 9-part expert editorial

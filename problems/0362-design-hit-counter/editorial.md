@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Count events in the trailing 300 seconds", non-decreasing timestamps, a class with per-call budgets — this is the **time-based sliding window**, the direct sequel to Moving Average (this problem's warmup). There the window was "last N *values*"; here it is "last 300 *seconds*", so eviction is triggered by timestamp comparison, not by length. This time/count duality is the core idiom of the Snowflake stream-design family, and interviewers deliberately pick one after the other to see whether you recognize the shared skeleton: bounded state + evict-stale-prefix + maintained aggregate.
+"Count events in the trailing 300 seconds", non-decreasing timestamps, a class with per-call budgets — this is the **time-based sliding window**, the direct sequel to Moving Average (this problem's warmup). There the window was "last N *values*"; here it is "last 300 *seconds*", so eviction is triggered by timestamp comparison, not by length. This time/count duality is the core idiom of the stream-design family, and interviewers deliberately pick one after the other to see whether you recognize the shared skeleton: bounded state + evict-stale-prefix + maintained aggregate.
 
 ## 2. Brute force first
 

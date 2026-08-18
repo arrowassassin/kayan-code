@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Minimum number of rooms" is not a merge and not a subset selection — it's a **maximum concurrent overlap** question: the answer equals the largest number of meetings alive at any single instant. That reframing unlocks two canonical Intervals tools at once: the **min-heap of end times** (simulate room reuse) and the **sweep line** (+1/−1 event counting). Interviewers at Snowflake and elsewhere love this problem because it forces the sort-key discussion *and* has two clean solutions worth comparing aloud.
+"Minimum number of rooms" is not a merge and not a subset selection — it's a **maximum concurrent overlap** question: the answer equals the largest number of meetings alive at any single instant. That reframing unlocks two canonical Intervals tools at once: the **min-heap of end times** (simulate room reuse) and the **sweep line** (+1/−1 event counting). Interviewers love this problem because it forces the sort-key discussion *and* has two clean solutions worth comparing aloud.
 
 ## 2. Brute force first
 

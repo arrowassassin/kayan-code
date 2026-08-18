@@ -2,7 +2,7 @@
 
 ## 1. Pattern recognition
 
-"Design a class", "O(1) per operation", eviction by a *ranked* criterion with a tie-break — this is the escalation chapter of LRU Cache (146). LRU needed one ordering (recency); LFU needs a two-level ordering (frequency, then recency within a frequency). The design pattern is the same **composite data structure** fusion, applied one level deeper: when a single ordered structure can't encode your eviction rule, shard it into buckets and keep a pointer to the bucket you evict from. Snowflake's stream-processing design questions live exactly here: strict per-op budgets on stateful classes.
+"Design a class", "O(1) per operation", eviction by a *ranked* criterion with a tie-break — this is the escalation chapter of LRU Cache (146). LRU needed one ordering (recency); LFU needs a two-level ordering (frequency, then recency within a frequency). The design pattern is the same **composite data structure** fusion, applied one level deeper: when a single ordered structure can't encode your eviction rule, shard it into buckets and keep a pointer to the bucket you evict from. Stream-processing design questions in senior interviews live exactly here: strict per-op budgets on stateful classes.
 
 ## 2. Brute force first
 
